@@ -10,385 +10,283 @@
 <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-/* DPS Biratnagar — Voting System (v3: vibrant election festival) */
 :root {
-  --paper: #fff4d6;
-  --paper-2: #ffe9b3;
-  --paper-3: #fffbe9;
-  --paper-4: #ffffff;
-  --ink: #1a1f6b;
-  --ink-2: #2c3592;
-  --ink-3: #555a85;
-  --ink-4: #8a8eb2;
-  --rule: #1a1f6b;
-  --stamp: #e02538;
-  --stamp-2: #b81b2c;
-  --stamp-3: #ff3a4d;
-  --seal: #f5a524;
-  --seal-2: #d4881a;
-  --tick: #11904a;
-  --tick-2: #0b6c37;
-  --accent-saffron: #ffa322;
-  --accent-magenta: #c0306d;
-  --accent-emerald: #11904a;
-  --accent-sky: #2e86c1;
-  --accent-violet: #6d3aa3;
+  --paper: #fff4d6; --paper-2: #ffe9b3; --paper-3: #fffbe9; --paper-4: #ffffff;
+  --ink: #1a1f6b; --ink-2: #2c3592; --ink-3: #555a85; --ink-4: #8a8eb2;
+  --rule: #1a1f6b; --stamp: #e02538; --stamp-2: #b81b2c; --stamp-3: #ff3a4d;
+  --seal: #f5a524; --seal-2: #d4881a; --tick: #11904a; --tick-2: #0b6c37;
+  --accent-saffron: #ffa322; --accent-magenta: #c0306d; --accent-emerald: #11904a;
+  --accent-sky: #2e86c1; --accent-violet: #6d3aa3;
   --shadow-sm: 0 1px 0 rgba(26,31,107,0.1);
   --shadow: 0 2px 0 rgba(26,31,107,0.12), 0 10px 28px rgba(26,31,107,0.14);
   --shadow-lg: 0 3px 0 rgba(26,31,107,0.14), 0 24px 56px rgba(26,31,107,0.22);
-  --serif: "DM Serif Display", "Source Serif 4", Georgia, serif;
-  --serif-text: "Source Serif 4", "DM Serif Display", Georgia, serif;
-  --sans: "IBM Plex Sans", system-ui, sans-serif;
-  --mono: "IBM Plex Mono", ui-monospace, monospace;
+  --serif: "DM Serif Display","Source Serif 4",Georgia,serif;
+  --serif-text: "Source Serif 4","DM Serif Display",Georgia,serif;
+  --sans: "IBM Plex Sans",system-ui,sans-serif;
+  --mono: "IBM Plex Mono",ui-monospace,monospace;
 }
 * { box-sizing: border-box; }
-html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font-family: var(--sans); font-size: 16px; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+html,body { margin:0; padding:0; background:var(--paper); color:var(--ink); font-family:var(--sans); font-size:16px; -webkit-font-smoothing:antialiased; }
 body {
   background:
-    radial-gradient(ellipse 900px 700px at 18% -10%, rgba(255,163,34,0.22), transparent 60%),
-    radial-gradient(ellipse 800px 600px at 100% 100%, rgba(224,37,56,0.14), transparent 60%),
-    radial-gradient(ellipse 700px 500px at 10% 80%, rgba(46,134,193,0.12), transparent 60%),
-    radial-gradient(ellipse 600px 400px at 90% 30%, rgba(192,48,109,0.10), transparent 65%),
+    radial-gradient(ellipse 900px 700px at 18% -10%,rgba(255,163,34,0.22),transparent 60%),
+    radial-gradient(ellipse 800px 600px at 100% 100%,rgba(224,37,56,0.14),transparent 60%),
+    radial-gradient(ellipse 700px 500px at 10% 80%,rgba(46,134,193,0.12),transparent 60%),
+    radial-gradient(ellipse 600px 400px at 90% 30%,rgba(192,48,109,0.10),transparent 65%),
     var(--paper);
-  background-attachment: fixed;
-  min-height: 100vh;
+  background-attachment:fixed; min-height:100vh;
 }
 body::before {
-  content: "";
-  position: fixed; inset: 0;
-  pointer-events: none;
+  content:""; position:fixed; inset:0; pointer-events:none;
   background-image:
-    radial-gradient(circle at 12% 18%, var(--accent-saffron) 3px, transparent 4px),
-    radial-gradient(circle at 88% 12%, var(--stamp) 2.5px, transparent 3.5px),
-    radial-gradient(circle at 22% 78%, var(--accent-emerald) 2.5px, transparent 3.5px),
-    radial-gradient(circle at 78% 88%, var(--accent-violet) 3px, transparent 4px),
-    radial-gradient(circle at 50% 6%, var(--accent-magenta) 2px, transparent 3px),
-    radial-gradient(circle at 6% 50%, var(--accent-sky) 2.5px, transparent 3.5px),
-    radial-gradient(circle at 94% 50%, var(--seal) 2.5px, transparent 3.5px),
-    radial-gradient(circle at 1px 1px, rgba(26,31,107,0.04) 1px, transparent 1.5px);
-  background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 18px 18px;
-  background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, repeat;
-  opacity: 0.55; z-index: 0;
+    radial-gradient(circle at 12% 18%,var(--accent-saffron) 3px,transparent 4px),
+    radial-gradient(circle at 88% 12%,var(--stamp) 2.5px,transparent 3.5px),
+    radial-gradient(circle at 22% 78%,var(--accent-emerald) 2.5px,transparent 3.5px),
+    radial-gradient(circle at 78% 88%,var(--accent-violet) 3px,transparent 4px),
+    radial-gradient(circle at 50% 6%,var(--accent-magenta) 2px,transparent 3px),
+    radial-gradient(circle at 6% 50%,var(--accent-sky) 2.5px,transparent 3.5px),
+    radial-gradient(circle at 94% 50%,var(--seal) 2.5px,transparent 3.5px),
+    radial-gradient(circle at 1px 1px,rgba(26,31,107,0.04) 1px,transparent 1.5px);
+  background-size:100% 100%,100% 100%,100% 100%,100% 100%,100% 100%,100% 100%,100% 100%,18px 18px;
+  background-repeat:no-repeat,no-repeat,no-repeat,no-repeat,no-repeat,no-repeat,no-repeat,repeat;
+  opacity:0.55; z-index:0;
 }
 body::after {
-  content: "";
-  position: fixed; inset: 0;
-  pointer-events: none;
-  background-image: repeating-linear-gradient(115deg, transparent 0 60px, rgba(26,31,107,0.04) 60px 61px, transparent 61px 120px, rgba(224,37,56,0.04) 120px 121px, transparent 121px 180px, rgba(17,144,74,0.04) 180px 181px);
-  z-index: 0;
+  content:""; position:fixed; inset:0; pointer-events:none;
+  background-image:repeating-linear-gradient(115deg,transparent 0 60px,rgba(26,31,107,0.04) 60px 61px,transparent 61px 120px,rgba(224,37,56,0.04) 120px 121px,transparent 121px 180px,rgba(17,144,74,0.04) 180px 181px);
+  z-index:0;
 }
-#root { position: relative; z-index: 1; min-height: 100vh; }
-.serif { font-family: var(--serif); font-weight: 400; letter-spacing: -0.01em; }
-.mono { font-family: var(--mono); }
-.uppercase { text-transform: uppercase; letter-spacing: 0.12em; }
-h1, h2, h3, h4 { font-family: var(--serif); font-weight: 400; margin: 0; letter-spacing: -0.015em; }
-.letterhead {
-  border-bottom: 3px double var(--rule);
-  padding: 22px 36px 20px;
-  display: flex; align-items: center; justify-content: space-between; gap: 24px;
-  background: linear-gradient(180deg, var(--paper-4) 0%, var(--paper-3) 100%);
-  position: relative;
-}
-.letterhead::after {
-  content: ""; position: absolute; left: 0; right: 0; bottom: -7px; height: 7px;
-  background: linear-gradient(90deg, var(--stamp) 0 14.28%, var(--accent-saffron) 14.28% 28.57%, var(--seal) 28.57% 42.85%, var(--accent-emerald) 42.85% 57.14%, var(--accent-sky) 57.14% 71.42%, var(--ink-2) 71.42% 85.71%, var(--accent-magenta) 85.71% 100%);
-  box-shadow: 0 1px 0 rgba(0,0,0,0.1);
-}
-.letterhead-left { display: flex; align-items: center; gap: 18px; }
-.crest { width: 64px; height: 64px; flex-shrink: 0; position: relative; color: var(--ink); }
-.crest svg { width: 100%; height: 100%; display: block; }
-.letterhead h1 { font-size: 28px; line-height: 1; }
-.letterhead .sub { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.22em; color: var(--ink-2); margin-top: 7px; display: flex; align-items: center; gap: 8px; }
-.letterhead .sub::before { content: ""; width: 18px; height: 1px; background: var(--stamp); }
-.letterhead-right { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.18em; color: var(--ink-2); text-align: right; }
-.stage { max-width: 920px; margin: 0 auto; padding: 36px 24px 80px; position: relative; }
-.stage-wide { max-width: 1320px; margin: 0 auto; padding: 28px 28px 80px; }
-.sheet { background: linear-gradient(180deg, var(--paper-4) 0%, var(--paper-3) 100%); border: 2px solid var(--rule); border-radius: 2px; position: relative; box-shadow: var(--shadow); }
-.sheet::before { content: ""; position: absolute; inset: 8px; border: 1px solid var(--rule); pointer-events: none; opacity: 0.7; }
-.sheet::after { content: ""; position: absolute; inset: 14px; border: 1px dashed rgba(20,33,61,0.18); pointer-events: none; }
-.sheet-inner { padding: 44px 48px; position: relative; z-index: 1; }
-.corner { position: absolute; width: 38px; height: 38px; color: var(--ink); opacity: 0.85; z-index: 2; pointer-events: none; }
-.corner.tl { top: 4px; left: 4px; }
-.corner.tr { top: 4px; right: 4px; transform: scaleX(-1); }
-.corner.bl { bottom: 4px; left: 4px; transform: scaleY(-1); }
-.corner.br { bottom: 4px; right: 4px; transform: scale(-1, -1); }
-.sheet-title { display: flex; flex-direction: column; align-items: center; gap: 6px; margin-bottom: 30px; text-align: center; }
-.sheet-title .eyebrow { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: var(--stamp); display: inline-flex; align-items: center; gap: 12px; }
-.sheet-title .eyebrow::before, .sheet-title .eyebrow::after { content: ""; width: 22px; height: 1px; background: var(--stamp); opacity: 0.6; }
-.sheet-title h2 { font-size: 46px; line-height: 1.02; text-wrap: balance; }
-.sheet-title .desc { font-family: var(--serif-text); color: var(--ink-2); max-width: 560px; font-size: 16px; font-style: italic; margin-top: 8px; line-height: 1.45; }
-.rule-orn { display: flex; align-items: center; gap: 12px; color: var(--ink); margin: 18px 0 28px; }
-.rule-orn::before, .rule-orn::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, var(--ink) 30%, var(--ink) 70%, transparent); }
-.rule-orn .dot { width: 10px; height: 10px; transform: rotate(45deg); background: var(--ink); position: relative; }
-.rule-orn .dot::before, .rule-orn .dot::after { content: ""; position: absolute; top: 50%; width: 6px; height: 1px; background: var(--ink); }
-.rule-orn .dot::before { right: 14px; }
-.rule-orn .dot::after { left: 14px; }
-.field { display: flex; flex-direction: column; gap: 8px; }
-.field label { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.22em; color: var(--ink-2); display: inline-flex; align-items: center; gap: 8px; }
-.field label::before { content: ""; width: 6px; height: 6px; background: var(--stamp); transform: rotate(45deg); display: inline-block; }
-.input { width: 100%; background: var(--paper-4); border: 1.5px solid var(--rule); padding: 14px 16px; font-family: var(--serif-text); font-size: 17px; color: var(--ink); border-radius: 2px; outline: none; transition: box-shadow 120ms, background 120ms; }
-.input:focus { background: #fff; box-shadow: 0 0 0 3px rgba(20,33,61,0.18), inset 0 0 0 1px var(--ink); }
-select.input { font-family: var(--sans); font-weight: 500; }
-.input.mono { font-family: var(--mono); }
-.row { display: grid; gap: 22px; }
-.row-2 { grid-template-columns: 1fr 1fr; }
-.row-3 { grid-template-columns: repeat(3, 1fr); }
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 14px 24px; font-family: var(--mono); font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.22em; border: 1.5px solid var(--ink); background: var(--paper-4); color: var(--ink); cursor: pointer; border-radius: 2px; transition: all 140ms; position: relative; }
-.btn:hover { background: var(--ink); color: var(--paper-4); transform: translateY(-1px); box-shadow: var(--shadow-sm); }
-.btn:active { transform: translateY(0); }
-.btn-primary { background: var(--ink); color: var(--paper-4); box-shadow: 0 2px 0 var(--ink-2); }
-.btn-primary:hover { background: var(--stamp); border-color: var(--stamp); box-shadow: 0 2px 0 var(--stamp-2); }
-.btn-stamp { background: var(--stamp); color: var(--paper-4); border-color: var(--stamp); box-shadow: 0 2px 0 var(--stamp-2); }
-.btn-stamp:hover { background: var(--stamp-2); border-color: var(--stamp-2); box-shadow: 0 2px 0 var(--ink); }
-.btn-ghost { border-color: transparent; background: transparent; box-shadow: none; }
-.btn-ghost:hover { background: transparent; color: var(--stamp); transform: none; box-shadow: none; }
-.btn:disabled { opacity: 0.35; cursor: not-allowed; }
-.btn:disabled:hover { background: var(--paper-4); color: var(--ink); transform: none; box-shadow: none; }
-.btn-primary:disabled:hover { background: var(--ink); color: var(--paper-4); }
-.btn-sm { padding: 10px 16px; font-size: 10px; letter-spacing: 0.18em; }
-.house-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
-.house-card { border: 2px solid var(--rule); background: var(--paper-4); padding: 24px 26px; display: flex; align-items: center; gap: 20px; cursor: pointer; transition: all 160ms; text-align: left; font-family: inherit; color: inherit; border-radius: 2px; position: relative; overflow: hidden; }
-.house-card::before { content: ""; position: absolute; inset: 6px; border: 1px solid var(--rule); pointer-events: none; opacity: 0.35; }
-.house-card::after { content: ""; position: absolute; top: -40px; right: -40px; width: 120px; height: 120px; border-radius: 50%; background: var(--house-color, var(--ink)); opacity: 0.08; pointer-events: none; transition: all 240ms; }
-.house-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
-.house-card:hover::after { opacity: 0.16; transform: scale(1.15); }
-.house-card:nth-child(1) { --house-accent: #1e8c3a; }
-.house-card:nth-child(2) { --house-accent: #e02538; }
-.house-card:nth-child(3) { --house-accent: #1a56b0; }
-.house-card:nth-child(4) { --house-accent: #f5c800; }
-.house-card:hover { border-color: var(--house-accent, var(--ink)); }
-.house-card.selected { background: var(--house-accent, var(--ink)); color: var(--paper-4); border-color: var(--house-accent, var(--ink)); }
-.house-card.selected::before { border-color: var(--paper-4); opacity: 0.4; }
-.house-card.selected::after { opacity: 0.32; }
-.house-card.selected .house-name { color: var(--paper-4); }
-.house-card.selected .house-meta { color: rgba(255,255,255,0.82); }
-.house-card.selected .house-swatch { border-color: var(--paper-4); box-shadow: 0 0 0 4px rgba(255,255,255,0.2), inset 0 -10px 18px rgba(0,0,0,0.25); }
-.house-swatch { width: 72px; height: 72px; border-radius: 50%; border: 3px solid var(--ink); flex-shrink: 0; position: relative; background: radial-gradient(circle at 30% 25%, rgba(255,255,255,0.45), transparent 50%), var(--house-color, var(--ink)); box-shadow: inset 0 -10px 18px rgba(0,0,0,0.25), 0 4px 12px rgba(0,0,0,0.15); }
-.house-swatch::after { content: ""; position: absolute; inset: 8px; border-radius: 50%; border: 1px dashed rgba(255,255,255,0.4); }
-.house-name { font-family: var(--serif); font-size: 32px; line-height: 1; }
-.house-meta { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.22em; color: var(--ink-3); margin-top: 8px; }
-.ballot-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
-.candidate-card { border: 2px solid var(--rule); background: var(--paper-4); padding: 0; cursor: pointer; display: grid; grid-template-columns: 78px 1fr 76px; align-items: stretch; transition: all 160ms; text-align: left; font-family: inherit; color: inherit; border-radius: 2px; overflow: hidden; position: relative; min-height: 96px; }
-.candidate-card:hover { background: #fff; transform: translateY(-1px); box-shadow: var(--shadow); }
-.candidate-sl { background: repeating-linear-gradient(0deg, transparent 0 6px, rgba(255,255,255,0.08) 6px 7px), var(--sl-color, var(--ink)); color: var(--paper-4); display: grid; place-items: center; font-family: var(--mono); font-size: 24px; font-weight: 600; letter-spacing: 0.02em; position: relative; }
-.candidate-card:nth-child(6n+1) { --sl-color: var(--stamp); }
-.candidate-card:nth-child(6n+2) { --sl-color: var(--accent-emerald); }
-.candidate-card:nth-child(6n+3) { --sl-color: var(--accent-saffron); }
-.candidate-card:nth-child(6n+4) { --sl-color: var(--accent-sky); }
-.candidate-card:nth-child(6n+5) { --sl-color: var(--accent-magenta); }
-.candidate-card:nth-child(6n+6) { --sl-color: var(--accent-violet); }
-.candidate-card:hover { border-color: var(--sl-color, var(--ink)); }
-.candidate-card.selected { border-color: var(--sl-color, var(--ink)); box-shadow: 0 0 0 3px var(--sl-color, var(--ink)) inset, 0 0 0 6px var(--paper-4) inset, var(--shadow); }
-.candidate-card.selected .candidate-symbol { background: radial-gradient(circle at center, var(--paper-4) 50%, transparent 50%) 0 0/8px 8px, color-mix(in srgb, var(--sl-color) 12%, var(--paper-3)); }
-.candidate-sl::after { content: ""; position: absolute; right: -1px; top: 8px; bottom: 8px; width: 2px; background-image: radial-gradient(circle, var(--paper-4) 1px, transparent 1.5px); background-size: 2px 6px; }
-.candidate-body { padding: 16px 18px; display: flex; flex-direction: column; justify-content: center; gap: 6px; min-width: 0; }
-.candidate-name { font-family: var(--serif); font-size: 26px; line-height: 1.05; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.candidate-meta { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.22em; color: var(--ink-3); display: inline-flex; align-items: center; gap: 8px; }
-.candidate-meta::before { content: ""; width: 16px; height: 1px; background: var(--ink-3); }
-.candidate-symbol { border-left: 1.5px solid var(--rule); background: radial-gradient(circle at center, var(--paper-4) 50%, transparent 50%) 0 0/8px 8px, var(--paper-3); display: grid; place-items: center; padding: 10px; }
-.candidate-symbol svg { width: 42px; height: 42px; color: var(--sl-color, var(--ink)); }
-.tick-stamp { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-14deg); width: 160px; height: 160px; border: 5px double var(--tick); border-radius: 50%; display: grid; place-items: center; color: var(--tick); font-family: var(--mono); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.22em; text-align: center; background: rgba(31,111,67,0.04); pointer-events: none; opacity: 0; animation: stampIn 320ms cubic-bezier(.2,.8,.2,1) forwards; z-index: 3; }
-.candidate-card.selected .tick-stamp { opacity: 1; }
-@keyframes stampIn { 0% { transform: translate(-50%, -50%) rotate(-40deg) scale(2); opacity: 0; } 50% { opacity: 0.95; } 100% { transform: translate(-50%, -50%) rotate(-14deg) scale(1); opacity: 1; } }
-.stepper { display: flex; align-items: center; gap: 0; border: 1.5px solid var(--rule); background: var(--paper-4); padding: 5px; margin-bottom: 26px; overflow: hidden; border-radius: 2px; box-shadow: var(--shadow-sm); }
-.stepper-item { flex: 1; padding: 10px 10px; font-family: var(--mono); font-size: 9px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.18em; text-align: center; color: var(--ink-3); border-right: 1px dashed rgba(20,33,61,0.25); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: all 160ms; }
-.stepper-item:last-child { border-right: none; }
-.stepper-item.done { color: var(--tick); background: rgba(31,111,67,0.06); }
-.stepper-item.active { color: var(--paper-4); background: var(--ink); font-weight: 600; }
-.admin-shell { display: grid; grid-template-columns: 260px 1fr; gap: 28px; margin-top: 28px; }
-.admin-nav { border: 2px solid var(--rule); background: linear-gradient(180deg, var(--paper-4), var(--paper-3)); padding: 8px; align-self: start; position: sticky; top: 18px; border-radius: 2px; box-shadow: var(--shadow-sm); }
-.admin-nav button { display: flex; align-items: center; width: 100%; text-align: left; background: transparent; border: none; padding: 13px 16px; font-family: var(--mono); font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.18em; color: var(--ink-2); cursor: pointer; border-left: 3px solid transparent; transition: all 120ms; }
-.admin-nav button:hover { color: var(--ink); background: rgba(20,33,61,0.04); }
-.admin-nav button.active { background: var(--paper-4); color: var(--ink); border-left-color: var(--nav-accent, var(--stamp)); font-weight: 600; box-shadow: inset 0 0 0 1px rgba(26,31,107,0.08); }
-.admin-nav button:nth-of-type(1).active { --nav-accent: var(--stamp); }
-.admin-nav button:nth-of-type(2).active { --nav-accent: var(--accent-emerald); }
-.admin-nav button:nth-of-type(3).active { --nav-accent: var(--accent-saffron); }
-.admin-nav button:nth-of-type(4).active { --nav-accent: var(--accent-magenta); }
-.admin-nav button:nth-of-type(5).active { --nav-accent: var(--accent-sky); }
-.admin-nav button:nth-of-type(6).active { --nav-accent: var(--accent-violet); }
-.admin-nav button:nth-of-type(7).active { --nav-accent: var(--stamp); }
-.admin-nav-section { font-family: var(--mono); font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.24em; color: var(--ink-4); padding: 16px 16px 8px; display: flex; align-items: center; gap: 8px; }
-.admin-nav-section::after { content: ""; flex: 1; height: 1px; background: rgba(20,33,61,0.15); }
-.admin-panel { background: linear-gradient(180deg, var(--paper-4), var(--paper-3)); border: 2px solid var(--rule); padding: 32px 36px; border-radius: 2px; min-height: 600px; box-shadow: var(--shadow); position: relative; }
-.admin-panel::before { content: ""; position: absolute; inset: 8px; border: 1px solid var(--rule); pointer-events: none; opacity: 0.4; }
-.admin-panel > * { position: relative; z-index: 1; }
-.admin-h { display: flex; align-items: end; justify-content: space-between; border-bottom: 3px double var(--rule); padding-bottom: 18px; margin-bottom: 26px; gap: 16px; }
-.admin-h h2 { font-size: 34px; }
-.admin-h .desc { color: var(--ink-2); font-size: 11px; margin-top: 6px; font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.22em; display: inline-flex; align-items: center; gap: 8px; }
-.admin-h .desc::before { content: ""; width: 18px; height: 1px; background: var(--stamp); }
-.stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
-.stat { border: 1.5px solid var(--rule); background: var(--paper-4); padding: 18px 20px; border-radius: 2px; position: relative; overflow: hidden; border-top: 5px solid var(--stat-accent, var(--ink)); }
-.stat:nth-child(1) { --stat-accent: var(--stamp); }
-.stat:nth-child(2) { --stat-accent: var(--accent-emerald); }
-.stat:nth-child(3) { --stat-accent: var(--accent-saffron); }
-.stat:nth-child(4) { --stat-accent: var(--accent-sky); }
-.stat::before { content: ""; position: absolute; inset: 5px; border: 1px dashed rgba(26,31,107,0.15); pointer-events: none; }
-.stat .val { color: var(--stat-accent, var(--ink)); }
-.stat > * { position: relative; z-index: 1; }
-.stat .label { font-family: var(--mono); font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.22em; color: var(--ink-3); }
-.stat .val { font-family: var(--serif); font-size: 52px; line-height: 1.02; margin-top: 6px; }
-.stat .sub { font-family: var(--mono); font-size: 9px; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.2em; margin-top: 4px; }
-.table { width: 100%; border-collapse: collapse; font-size: 14px; border: 1.5px solid var(--rule); background: var(--paper-4); }
-.table th { font-family: var(--mono); font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.22em; color: var(--ink-3); text-align: left; padding: 12px 14px; border-bottom: 1.5px solid var(--rule); background: var(--paper-2); }
-.table td { padding: 14px; border-bottom: 1px dashed rgba(20,33,61,0.18); vertical-align: middle; }
-.table tr:last-child td { border-bottom: none; }
-.table tr:hover td { background: rgba(20,33,61,0.03); }
-.chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 11px; border: 1px solid var(--rule); background: var(--paper-4); font-family: var(--mono); font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.18em; border-radius: 2px; }
-.chip-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ink); }
-.chip.stamp { color: var(--stamp); border-color: var(--stamp); background: rgba(139,31,47,0.05); }
-.chip.stamp .chip-dot { background: var(--stamp); }
-.chip.tick { color: var(--tick); border-color: var(--tick); background: rgba(31,111,67,0.06); }
-.chip.tick .chip-dot { background: var(--tick); animation: pulse 1.8s ease-in-out infinite; }
-@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
-.bar-row { display: grid; grid-template-columns: 38px 46px 1fr 90px; gap: 16px; align-items: center; padding: 12px 0; border-bottom: 1px dashed rgba(20,33,61,0.18); }
-.bar-row:last-child { border-bottom: none; }
-.bar-sl { font-family: var(--mono); color: var(--ink-3); font-size: 12px; font-weight: 600; }
-.bar-symbol { display: grid; place-items: center; width: 44px; height: 44px; border: 1.5px solid var(--bar-color, var(--rule)); background: var(--paper-4); border-radius: 2px; color: var(--bar-color, var(--ink)); }
-.bar-name { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
-.bar-name .nm { font-family: var(--serif); font-size: 20px; line-height: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.bar-track { height: 12px; background: var(--paper-2); border: 1px solid var(--rule); border-radius: 2px; overflow: hidden; }
-.bar-fill { height: 100%; background: repeating-linear-gradient(45deg, var(--bar-color, var(--ink)) 0 7px, color-mix(in srgb, var(--bar-color, var(--ink)) 70%, black) 7px 14px); transition: width 400ms cubic-bezier(.2,.8,.2,1); }
-.bar-row:nth-child(6n+1) { --bar-color: var(--accent-sky); }
-.bar-row:nth-child(6n+2) { --bar-color: var(--accent-emerald); }
-.bar-row:nth-child(6n+3) { --bar-color: var(--accent-saffron); }
-.bar-row:nth-child(6n+4) { --bar-color: var(--accent-magenta); }
-.bar-row:nth-child(6n+5) { --bar-color: var(--accent-violet); }
-.bar-row:nth-child(6n+6) { --bar-color: var(--ink-2); }
-.bar-fill.lead { background: repeating-linear-gradient(45deg, var(--stamp) 0 7px, var(--stamp-2) 7px 14px); }
-.bar-symbol svg { width: 26px; height: 26px; color: var(--bar-color, var(--ink)); }
-.bar-count { font-family: var(--mono); font-size: 14px; text-align: right; font-weight: 600; }
-.modal-backdrop { position: fixed; inset: 0; background: rgba(20,33,61,0.55); backdrop-filter: blur(2px); display: grid; place-items: center; z-index: 1000; padding: 20px; animation: fadeIn 180ms; }
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-.modal { background: linear-gradient(180deg, var(--paper-4), var(--paper-3)); border: 2px solid var(--rule); border-radius: 2px; width: 100%; max-width: 680px; max-height: 92vh; overflow: auto; position: relative; box-shadow: var(--shadow-lg); animation: modalIn 220ms cubic-bezier(.2,.8,.2,1); }
-@keyframes modalIn { from { transform: translateY(20px) scale(0.98); opacity: 0; } to { transform: none; opacity: 1; } }
-.modal::before { content: ""; position: absolute; inset: 8px; border: 1px solid var(--rule); pointer-events: none; opacity: 0.5; }
-.modal-inner { padding: 32px 36px; position: relative; z-index: 1; }
-.modal-h { display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid var(--rule); padding-bottom: 14px; margin-bottom: 22px; }
-.modal-h h3 { font-size: 28px; }
-.x-btn { background: transparent; border: none; cursor: pointer; font-family: var(--mono); font-size: 11px; font-weight: 500; color: var(--ink-2); text-transform: uppercase; letter-spacing: 0.18em; }
-.x-btn:hover { color: var(--stamp); }
-.symbol-picker { display: grid; grid-template-columns: repeat(8, 1fr); gap: 7px; margin-top: 10px; }
-.symbol-opt { aspect-ratio: 1; border: 1.5px solid var(--rule); background: var(--paper-4); display: grid; place-items: center; cursor: pointer; border-radius: 2px; transition: all 140ms; }
-.symbol-opt:hover { background: var(--paper-2); transform: translateY(-1px); }
-.symbol-opt.selected { background: var(--stamp); border-color: var(--stamp); box-shadow: 0 0 0 2px var(--paper-4), 0 0 0 3.5px var(--stamp); }
-.symbol-opt.selected svg { color: var(--paper-4); }
-.symbol-opt svg { width: 30px; height: 30px; color: var(--ink); transition: color 120ms; }
-.image-slot { border: 1.5px dashed var(--rule); background: var(--paper-4); display: grid; place-items: center; aspect-ratio: 1; width: 100%; cursor: pointer; color: var(--ink-3); font-family: var(--mono); font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.18em; text-align: center; padding: 10px; position: relative; overflow: hidden; transition: all 140ms; }
-.image-slot img { width: 100%; height: 100%; object-fit: cover; }
-.image-slot:hover { border-color: var(--stamp); color: var(--stamp); background: rgba(139,31,47,0.04); }
-.lock-card { max-width: 460px; }
-.lock-inner { padding: 48px 44px; text-align: center; }
-.lock-icon { width: 80px; height: 80px; margin: 0 auto 18px; border: 2.5px solid var(--stamp); border-radius: 50%; display: grid; place-items: center; background: radial-gradient(circle, rgba(224,37,56,0.1), transparent 70%); color: var(--stamp); position: relative; }
-.lock-icon::after { content: ""; position: absolute; inset: -8px; border: 1.5px dashed var(--stamp); border-radius: 50%; opacity: 0.5; }
-.lock-shake { animation: shake 360ms; }
-@keyframes shake { 10%, 90% { transform: translateX(-2px); } 20%, 80% { transform: translateX(4px); } 30%, 50%, 70% { transform: translateX(-6px); } 40%, 60% { transform: translateX(6px); } }
-.lock-pw-input { font-family: var(--mono); font-size: 18px; letter-spacing: 0.32em; text-align: center; padding: 16px; }
-.lock-hint { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--ink-3); margin-top: 14px; display: flex; align-items: center; justify-content: center; gap: 8px; }
-.lock-err { color: var(--stamp); font-family: var(--mono); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.18em; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; }
-.welcome { display: grid; place-items: center; min-height: calc(100vh - 110px); padding: 40px 20px; position: relative; }
-.welcome::before, .welcome::after { content: ""; position: absolute; width: 240px; height: 240px; border-radius: 50%; background: radial-gradient(circle, rgba(139,31,47,0.05), transparent 70%); pointer-events: none; z-index: 0; }
-.welcome::before { top: 5%; left: 8%; }
-.welcome::after { bottom: 5%; right: 8%; background: radial-gradient(circle, rgba(184,137,61,0.06), transparent 70%); }
-.welcome-card { background: linear-gradient(180deg, var(--paper-4), var(--paper-3)); border: 2px solid var(--rule); border-radius: 2px; max-width: 760px; width: 100%; position: relative; box-shadow: var(--shadow-lg); z-index: 1; }
-.welcome-card::before { content: ""; position: absolute; inset: 8px; border: 1px solid var(--rule); pointer-events: none; opacity: 0.7; }
-.welcome-card::after { content: ""; position: absolute; inset: 14px; border: 1px dashed rgba(20,33,61,0.18); pointer-events: none; }
-.welcome-inner { padding: 64px 72px; text-align: center; position: relative; z-index: 1; }
-.welcome-crest { width: 92px; height: 92px; margin: 0 auto 18px; color: var(--ink); }
-.welcome-crest svg { width: 100%; height: 100%; }
-.welcome-eyebrow { font-family: var(--mono); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.32em; color: var(--stamp); display: inline-flex; align-items: center; gap: 14px; }
-.welcome-eyebrow::before, .welcome-eyebrow::after { content: ""; width: 26px; height: 1px; background: var(--stamp); }
-.welcome h1 { font-size: 64px; line-height: 0.98; margin-top: 16px; text-wrap: balance; }
-.welcome .scroll { font-family: var(--serif-text); font-style: italic; color: var(--ink-2); margin-top: 20px; font-size: 18px; line-height: 1.5; }
-.welcome-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 40px; }
-.action-card { border: 2px solid var(--rule); background: var(--paper-4); padding: 26px 24px; text-align: left; cursor: pointer; font-family: inherit; color: inherit; border-radius: 2px; transition: all 180ms; position: relative; overflow: hidden; }
-.action-card:nth-child(1) { --ac-accent: var(--stamp); }
-.action-card:nth-child(2) { --ac-accent: var(--accent-emerald); }
-.action-card::before { content: ""; position: absolute; top: -50px; right: -50px; width: 160px; height: 160px; border-radius: 50%; background: var(--ac-accent, var(--ink)); opacity: 0.1; transition: all 280ms; }
-.action-card::after { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--ac-accent, var(--ink)); transition: all 200ms; }
-.action-card:hover { background: var(--ac-accent, var(--ink)); color: var(--paper-4); border-color: var(--ac-accent, var(--ink)); transform: translateY(-3px); box-shadow: 0 6px 0 color-mix(in srgb, var(--ac-accent) 60%, black), 0 20px 36px rgba(0,0,0,0.18); }
-.action-card:hover::before { background: var(--paper-4); opacity: 0.18; transform: scale(1.6); }
-.action-card:hover::after { width: 100%; opacity: 0; }
-.action-card .ac-eye { font-family: var(--mono); font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.22em; opacity: 0.65; display: inline-flex; align-items: center; gap: 8px; }
-.action-card .ac-eye::before { content: ""; width: 14px; height: 1px; background: currentColor; }
-.action-card .ac-h { font-family: var(--serif); font-size: 30px; margin-top: 10px; line-height: 1.05; }
-.action-card .ac-desc { font-family: var(--serif-text); font-size: 13px; margin-top: 8px; opacity: 0.78; line-height: 1.45; font-style: italic; }
-.action-card .ac-arrow { position: absolute; bottom: 18px; right: 18px; width: 32px; height: 32px; border: 1.5px solid currentColor; border-radius: 50%; display: grid; place-items: center; opacity: 0.6; transition: all 180ms; }
-.action-card:hover .ac-arrow { opacity: 1; transform: translateX(3px); }
-.watermark { position: absolute; inset: 0; pointer-events: none; display: grid; place-items: center; opacity: 0.04; z-index: 0; overflow: hidden; }
-.watermark .wm-text { font-family: var(--serif); font-size: 150px; white-space: nowrap; transform: rotate(-22deg); }
-.done-card { text-align: center; padding: 56px 48px; }
-.done-seal { width: 200px; height: 200px; border: 5px double var(--stamp); border-radius: 50%; margin: 0 auto 28px; display: grid; place-items: center; color: var(--stamp); font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.22em; font-size: 11px; font-weight: 600; transform: rotate(-8deg); position: relative; background: radial-gradient(circle at center, rgba(139,31,47,0.06) 30%, transparent 70%); animation: sealStamp 600ms cubic-bezier(.34,1.6,.64,1) backwards; }
-@keyframes sealStamp { from { transform: rotate(-30deg) scale(2); opacity: 0; } to { transform: rotate(-8deg) scale(1); opacity: 1; } }
-.done-seal::before { content: ""; position: absolute; inset: 10px; border: 1.5px solid var(--stamp); border-radius: 50%; }
-.done-seal::after { content: ""; position: absolute; inset: -14px; border: 1.5px dashed var(--stamp); border-radius: 50%; opacity: 0.4; animation: spin 60s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
-.done-seal-inner { line-height: 1.4; position: relative; z-index: 1; }
-.done-seal-inner .big { font-family: var(--serif); font-size: 40px; letter-spacing: 0; text-transform: none; display: block; margin: 4px 0 2px; }
-.ico { width: 16px; height: 16px; flex-shrink: 0; }
-.toggle { display: inline-flex; align-items: center; gap: 12px; cursor: pointer; }
-.toggle-track { width: 48px; height: 26px; border: 1.5px solid var(--rule); background: var(--paper-4); border-radius: 999px; position: relative; transition: all 160ms; }
-.toggle-track::after { content: ""; position: absolute; width: 18px; height: 18px; background: var(--ink); border-radius: 50%; top: 2px; left: 2px; transition: all 180ms cubic-bezier(.2,.8,.2,1); }
-.toggle.on .toggle-track { background: var(--tick); border-color: var(--tick); }
-.toggle.on .toggle-track::after { left: 24px; background: var(--paper-4); }
-.empty { text-align: center; padding: 56px 24px; color: var(--ink-3); border: 1.5px dashed var(--rule); border-radius: 2px; background: var(--paper-4); }
-.empty h4 { font-size: 26px; color: var(--ink); margin-bottom: 8px; }
-.empty p { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.18em; margin: 8px 0 20px; }
-.receipt { display: inline-grid; grid-template-columns: auto auto; gap: 8px 32px; font-family: var(--mono); font-size: 13px; text-align: left; background: var(--paper-4); border: 1.5px solid var(--rule); padding: 22px 28px; border-radius: 2px; position: relative; }
-.receipt::before, .receipt::after { content: ""; position: absolute; width: 24px; height: 24px; border: 1.5px solid var(--rule); background: var(--paper); border-radius: 50%; }
-.receipt::before { top: -12px; left: 50%; transform: translateX(-50%); }
-.receipt::after { bottom: -12px; left: 50%; transform: translateX(-50%); }
-.receipt .lbl { color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.18em; font-size: 10px; font-weight: 600; }
-@media (max-width: 760px) {
-  .row-2, .row-3 { grid-template-columns: 1fr; }
-  .ballot-grid { grid-template-columns: 1fr; }
-  .stat-grid { grid-template-columns: 1fr 1fr; }
-  .admin-shell { grid-template-columns: 1fr; }
-  .admin-nav { position: static; }
-  .sheet-inner { padding: 28px 22px; }
-  .welcome-inner { padding: 42px 24px; }
-  .welcome h1 { font-size: 42px; }
-  .sheet-title h2 { font-size: 32px; }
-  .house-grid { grid-template-columns: 1fr; }
-  .symbol-picker { grid-template-columns: repeat(6, 1fr); }
-  .candidate-card { grid-template-columns: 56px 1fr 56px; }
-  .candidate-name { font-size: 20px; }
-  .welcome-actions { grid-template-columns: 1fr; }
-  .stat .val { font-size: 36px; }
-  .admin-h h2 { font-size: 26px; }
+#root { position:relative; z-index:1; min-height:100vh; }
+h1,h2,h3,h4 { font-family:var(--serif); font-weight:400; margin:0; letter-spacing:-0.015em; }
+.letterhead { border-bottom:3px double var(--rule); padding:22px 36px 20px; display:flex; align-items:center; justify-content:space-between; gap:24px; background:linear-gradient(180deg,var(--paper-4) 0%,var(--paper-3) 100%); position:relative; }
+.letterhead::after { content:""; position:absolute; left:0; right:0; bottom:-7px; height:7px; background:linear-gradient(90deg,var(--stamp) 0 14.28%,var(--accent-saffron) 14.28% 28.57%,var(--seal) 28.57% 42.85%,var(--accent-emerald) 42.85% 57.14%,var(--accent-sky) 57.14% 71.42%,var(--ink-2) 71.42% 85.71%,var(--accent-magenta) 85.71% 100%); box-shadow:0 1px 0 rgba(0,0,0,0.1); }
+.letterhead-left { display:flex; align-items:center; gap:18px; }
+.letterhead h1 { font-size:28px; line-height:1; }
+.letterhead .sub { font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:0.22em; color:var(--ink-2); margin-top:7px; display:flex; align-items:center; gap:8px; }
+.letterhead .sub::before { content:""; width:18px; height:1px; background:var(--stamp); }
+.letterhead-right { font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:0.18em; color:var(--ink-2); text-align:right; }
+.stage { max-width:920px; margin:0 auto; padding:36px 24px 80px; position:relative; }
+.stage-wide { max-width:1320px; margin:0 auto; padding:28px 28px 80px; }
+.sheet { background:linear-gradient(180deg,var(--paper-4) 0%,var(--paper-3) 100%); border:2px solid var(--rule); border-radius:2px; position:relative; box-shadow:var(--shadow); }
+.sheet::before { content:""; position:absolute; inset:8px; border:1px solid var(--rule); pointer-events:none; opacity:0.7; }
+.sheet::after { content:""; position:absolute; inset:14px; border:1px dashed rgba(20,33,61,0.18); pointer-events:none; }
+.sheet-inner { padding:44px 48px; position:relative; z-index:1; }
+.corner { position:absolute; width:38px; height:38px; color:var(--ink); opacity:0.85; z-index:2; pointer-events:none; }
+.corner.tl{top:4px;left:4px}.corner.tr{top:4px;right:4px;transform:scaleX(-1)}.corner.bl{bottom:4px;left:4px;transform:scaleY(-1)}.corner.br{bottom:4px;right:4px;transform:scale(-1,-1)}
+.sheet-title { display:flex; flex-direction:column; align-items:center; gap:6px; margin-bottom:30px; text-align:center; }
+.sheet-title .eyebrow { font-family:var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:0.28em; color:var(--stamp); display:inline-flex; align-items:center; gap:12px; }
+.sheet-title .eyebrow::before,.sheet-title .eyebrow::after { content:""; width:22px; height:1px; background:var(--stamp); opacity:0.6; }
+.sheet-title h2 { font-size:46px; line-height:1.02; }
+.sheet-title .desc { font-family:var(--serif-text); color:var(--ink-2); max-width:560px; font-size:16px; font-style:italic; margin-top:8px; line-height:1.45; }
+.rule-orn { display:flex; align-items:center; gap:12px; color:var(--ink); margin:18px 0 28px; }
+.rule-orn::before,.rule-orn::after { content:""; flex:1; height:1px; background:linear-gradient(90deg,transparent,var(--ink) 30%,var(--ink) 70%,transparent); }
+.rule-orn .dot { width:10px; height:10px; transform:rotate(45deg); background:var(--ink); position:relative; }
+.rule-orn .dot::before,.rule-orn .dot::after { content:""; position:absolute; top:50%; width:6px; height:1px; background:var(--ink); }
+.rule-orn .dot::before{right:14px}.rule-orn .dot::after{left:14px}
+.field { display:flex; flex-direction:column; gap:8px; }
+.field label { font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:0.22em; color:var(--ink-2); display:inline-flex; align-items:center; gap:8px; }
+.field label::before { content:""; width:6px; height:6px; background:var(--stamp); transform:rotate(45deg); display:inline-block; }
+.input { width:100%; background:var(--paper-4); border:1.5px solid var(--rule); padding:14px 16px; font-family:var(--serif-text); font-size:17px; color:var(--ink); border-radius:2px; outline:none; transition:box-shadow 120ms,background 120ms; }
+.input:focus { background:#fff; box-shadow:0 0 0 3px rgba(20,33,61,0.18),inset 0 0 0 1px var(--ink); }
+select.input { font-family:var(--sans); font-weight:500; }
+.row { display:grid; gap:22px; }
+.row-2 { grid-template-columns:1fr 1fr; }
+.btn { display:inline-flex; align-items:center; justify-content:center; gap:10px; padding:14px 24px; font-family:var(--mono); font-size:12px; font-weight:500; text-transform:uppercase; letter-spacing:0.22em; border:1.5px solid var(--ink); background:var(--paper-4); color:var(--ink); cursor:pointer; border-radius:2px; transition:all 140ms; }
+.btn:hover { background:var(--ink); color:var(--paper-4); transform:translateY(-1px); box-shadow:var(--shadow-sm); }
+.btn:active { transform:translateY(0); }
+.btn-primary { background:var(--ink); color:var(--paper-4); box-shadow:0 2px 0 var(--ink-2); }
+.btn-primary:hover { background:var(--stamp); border-color:var(--stamp); box-shadow:0 2px 0 var(--stamp-2); }
+.btn-stamp { background:var(--stamp); color:var(--paper-4); border-color:var(--stamp); box-shadow:0 2px 0 var(--stamp-2); }
+.btn-stamp:hover { background:var(--stamp-2); border-color:var(--stamp-2); }
+.btn-ghost { border-color:transparent; background:transparent; box-shadow:none; }
+.btn-ghost:hover { background:transparent; color:var(--stamp); transform:none; box-shadow:none; }
+.btn:disabled { opacity:0.35; cursor:not-allowed; }
+.btn:disabled:hover { background:var(--paper-4); color:var(--ink); transform:none; box-shadow:none; }
+.btn-primary:disabled:hover { background:var(--ink); color:var(--paper-4); }
+.btn-sm { padding:10px 16px; font-size:10px; letter-spacing:0.18em; }
+.house-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:18px; }
+.house-card { border:2px solid var(--rule); background:var(--paper-4); padding:24px 26px; display:flex; align-items:center; gap:20px; cursor:pointer; transition:all 160ms; text-align:left; font-family:inherit; color:inherit; border-radius:2px; position:relative; overflow:hidden; }
+.house-card::before { content:""; position:absolute; inset:6px; border:1px solid var(--rule); pointer-events:none; opacity:0.35; }
+.house-card::after { content:""; position:absolute; top:-40px; right:-40px; width:120px; height:120px; border-radius:50%; background:var(--house-color,var(--ink)); opacity:0.08; pointer-events:none; transition:all 240ms; }
+.house-card:hover { transform:translateY(-2px); box-shadow:var(--shadow); border-color:var(--house-color,var(--ink)); }
+.house-card:hover::after { opacity:0.16; transform:scale(1.15); }
+.house-card.selected { background:var(--house-color,var(--ink)); color:var(--paper-4); border-color:var(--house-color,var(--ink)); }
+.house-card.selected::before { border-color:var(--paper-4); opacity:0.4; }
+.house-card.selected .house-meta { color:rgba(255,255,255,0.82); }
+.house-card.selected .house-swatch { border-color:var(--paper-4); }
+.house-swatch { width:72px; height:72px; border-radius:50%; border:3px solid var(--ink); flex-shrink:0; background:radial-gradient(circle at 30% 25%,rgba(255,255,255,0.45),transparent 50%),var(--house-color,var(--ink)); box-shadow:inset 0 -10px 18px rgba(0,0,0,0.25),0 4px 12px rgba(0,0,0,0.15); }
+.house-name { font-family:var(--serif); font-size:32px; line-height:1; }
+.house-meta { font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:0.22em; color:var(--ink-3); margin-top:8px; }
+.ballot-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; }
+.candidate-card { border:2px solid var(--rule); background:var(--paper-4); padding:0; cursor:pointer; display:grid; grid-template-columns:78px 1fr 76px; align-items:stretch; transition:all 160ms; text-align:left; font-family:inherit; color:inherit; border-radius:2px; overflow:hidden; position:relative; min-height:96px; }
+.candidate-card:hover { background:#fff; transform:translateY(-1px); box-shadow:var(--shadow); border-color:var(--sl-color,var(--ink)); }
+.candidate-card.selected { border-color:var(--sl-color,var(--ink)); box-shadow:0 0 0 3px var(--sl-color,var(--ink)) inset,0 0 0 6px var(--paper-4) inset,var(--shadow); }
+.candidate-card:nth-child(6n+1){--sl-color:var(--stamp)}.candidate-card:nth-child(6n+2){--sl-color:var(--accent-emerald)}.candidate-card:nth-child(6n+3){--sl-color:var(--accent-saffron)}.candidate-card:nth-child(6n+4){--sl-color:var(--accent-sky)}.candidate-card:nth-child(6n+5){--sl-color:var(--accent-magenta)}.candidate-card:nth-child(6n+6){--sl-color:var(--accent-violet)}
+.candidate-sl { background:repeating-linear-gradient(0deg,transparent 0 6px,rgba(255,255,255,0.08) 6px 7px),var(--sl-color,var(--ink)); color:var(--paper-4); display:grid; place-items:center; font-family:var(--mono); font-size:24px; font-weight:600; position:relative; }
+.candidate-sl::after { content:""; position:absolute; right:-1px; top:8px; bottom:8px; width:2px; background-image:radial-gradient(circle,var(--paper-4) 1px,transparent 1.5px); background-size:2px 6px; }
+.candidate-body { padding:16px 18px; display:flex; flex-direction:column; justify-content:center; gap:6px; min-width:0; }
+.candidate-name { font-family:var(--serif); font-size:26px; line-height:1.05; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.candidate-meta { font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:0.22em; color:var(--ink-3); display:inline-flex; align-items:center; gap:8px; }
+.candidate-meta::before { content:""; width:16px; height:1px; background:var(--ink-3); }
+.candidate-symbol { border-left:1.5px solid var(--rule); background:radial-gradient(circle at center,var(--paper-4) 50%,transparent 50%) 0 0/8px 8px,var(--paper-3); display:grid; place-items:center; padding:10px; }
+.candidate-symbol svg { width:42px; height:42px; color:var(--sl-color,var(--ink)); }
+.candidate-card.selected .candidate-symbol { background:radial-gradient(circle at center,var(--paper-4) 50%,transparent 50%) 0 0/8px 8px,color-mix(in srgb,var(--sl-color) 12%,var(--paper-3)); }
+.tick-stamp { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%) rotate(-14deg); width:160px; height:160px; border:5px double var(--tick); border-radius:50%; display:grid; place-items:center; color:var(--tick); font-family:var(--mono); font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.22em; text-align:center; background:rgba(31,111,67,0.04); pointer-events:none; opacity:0; animation:stampIn 320ms cubic-bezier(.2,.8,.2,1) forwards; z-index:3; }
+.candidate-card.selected .tick-stamp { opacity:1; }
+@keyframes stampIn { 0%{transform:translate(-50%,-50%) rotate(-40deg) scale(2);opacity:0} 50%{opacity:0.95} 100%{transform:translate(-50%,-50%) rotate(-14deg) scale(1);opacity:1} }
+.stepper { display:flex; align-items:center; border:1.5px solid var(--rule); background:var(--paper-4); padding:5px; margin-bottom:26px; overflow:hidden; border-radius:2px; box-shadow:var(--shadow-sm); }
+.stepper-item { flex:1; padding:10px; font-family:var(--mono); font-size:9px; font-weight:500; text-transform:uppercase; letter-spacing:0.18em; text-align:center; color:var(--ink-3); border-right:1px dashed rgba(20,33,61,0.25); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; transition:all 160ms; }
+.stepper-item:last-child{border-right:none}
+.stepper-item.done{color:var(--tick);background:rgba(31,111,67,0.06)}
+.stepper-item.active{color:var(--paper-4);background:var(--ink);font-weight:600}
+.admin-shell { display:grid; grid-template-columns:260px 1fr; gap:28px; margin-top:28px; }
+.admin-nav { border:2px solid var(--rule); background:linear-gradient(180deg,var(--paper-4),var(--paper-3)); padding:8px; align-self:start; position:sticky; top:18px; border-radius:2px; box-shadow:var(--shadow-sm); }
+.admin-nav button { display:flex; align-items:center; width:100%; text-align:left; background:transparent; border:none; padding:13px 16px; font-family:var(--mono); font-size:11px; font-weight:500; text-transform:uppercase; letter-spacing:0.18em; color:var(--ink-2); cursor:pointer; border-left:3px solid transparent; transition:all 120ms; }
+.admin-nav button:hover{color:var(--ink);background:rgba(20,33,61,0.04)}
+.admin-nav button.active{background:var(--paper-4);color:var(--ink);border-left-color:var(--nav-accent,var(--stamp));font-weight:600;box-shadow:inset 0 0 0 1px rgba(26,31,107,0.08)}
+.admin-nav button:nth-of-type(1).active{--nav-accent:var(--stamp)}.admin-nav button:nth-of-type(2).active{--nav-accent:var(--accent-emerald)}.admin-nav button:nth-of-type(3).active{--nav-accent:var(--accent-saffron)}.admin-nav button:nth-of-type(4).active{--nav-accent:var(--accent-magenta)}.admin-nav button:nth-of-type(5).active{--nav-accent:var(--accent-sky)}.admin-nav button:nth-of-type(6).active{--nav-accent:var(--accent-violet)}.admin-nav button:nth-of-type(7).active{--nav-accent:var(--stamp)}
+.admin-nav-section { font-family:var(--mono); font-size:9px; font-weight:600; text-transform:uppercase; letter-spacing:0.24em; color:var(--ink-4); padding:16px 16px 8px; display:flex; align-items:center; gap:8px; }
+.admin-nav-section::after{content:"";flex:1;height:1px;background:rgba(20,33,61,0.15)}
+.admin-panel { background:linear-gradient(180deg,var(--paper-4),var(--paper-3)); border:2px solid var(--rule); padding:32px 36px; border-radius:2px; min-height:600px; box-shadow:var(--shadow); position:relative; }
+.admin-panel::before{content:"";position:absolute;inset:8px;border:1px solid var(--rule);pointer-events:none;opacity:0.4}
+.admin-panel>*{position:relative;z-index:1}
+.admin-h { display:flex; align-items:end; justify-content:space-between; border-bottom:3px double var(--rule); padding-bottom:18px; margin-bottom:26px; gap:16px; }
+.admin-h h2{font-size:34px}
+.admin-h .desc{color:var(--ink-2);font-size:11px;margin-top:6px;font-family:var(--mono);text-transform:uppercase;letter-spacing:0.22em;display:inline-flex;align-items:center;gap:8px}
+.admin-h .desc::before{content:"";width:18px;height:1px;background:var(--stamp)}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
+.stat{border:1.5px solid var(--rule);background:var(--paper-4);padding:18px 20px;border-radius:2px;position:relative;overflow:hidden;border-top:5px solid var(--stat-accent,var(--ink))}
+.stat:nth-child(1){--stat-accent:var(--stamp)}.stat:nth-child(2){--stat-accent:var(--accent-emerald)}.stat:nth-child(3){--stat-accent:var(--accent-saffron)}.stat:nth-child(4){--stat-accent:var(--accent-sky)}
+.stat::before{content:"";position:absolute;inset:5px;border:1px dashed rgba(26,31,107,0.15);pointer-events:none}
+.stat>*{position:relative;z-index:1}
+.stat .label{font-family:var(--mono);font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.22em;color:var(--ink-3)}
+.stat .val{font-family:var(--serif);font-size:52px;line-height:1.02;margin-top:6px;color:var(--stat-accent,var(--ink))}
+.stat .sub{font-family:var(--mono);font-size:9px;color:var(--ink-3);text-transform:uppercase;letter-spacing:0.2em;margin-top:4px}
+.table{width:100%;border-collapse:collapse;font-size:14px;border:1.5px solid var(--rule);background:var(--paper-4)}
+.table th{font-family:var(--mono);font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.22em;color:var(--ink-3);text-align:left;padding:12px 14px;border-bottom:1.5px solid var(--rule);background:var(--paper-2)}
+.table td{padding:14px;border-bottom:1px dashed rgba(20,33,61,0.18);vertical-align:middle}
+.table tr:last-child td{border-bottom:none}.table tr:hover td{background:rgba(20,33,61,0.03)}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:4px 11px;border:1px solid var(--rule);background:var(--paper-4);font-family:var(--mono);font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:0.18em;border-radius:2px}
+.chip-dot{width:6px;height:6px;border-radius:50%;background:var(--ink)}
+.chip.stamp{color:var(--stamp);border-color:var(--stamp);background:rgba(139,31,47,0.05)}.chip.stamp .chip-dot{background:var(--stamp)}
+.chip.tick{color:var(--tick);border-color:var(--tick);background:rgba(31,111,67,0.06)}.chip.tick .chip-dot{background:var(--tick);animation:pulse 1.8s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+.bar-row{display:grid;grid-template-columns:38px 46px 1fr 90px;gap:16px;align-items:center;padding:12px 0;border-bottom:1px dashed rgba(20,33,61,0.18)}
+.bar-row:last-child{border-bottom:none}
+.bar-sl{font-family:var(--mono);color:var(--ink-3);font-size:12px;font-weight:600}
+.bar-symbol{display:grid;place-items:center;width:44px;height:44px;border:1.5px solid var(--bar-color,var(--rule));background:var(--paper-4);border-radius:2px;color:var(--bar-color,var(--ink))}
+.bar-name{display:flex;flex-direction:column;gap:5px;min-width:0}
+.bar-name .nm{font-family:var(--serif);font-size:20px;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar-track{height:12px;background:var(--paper-2);border:1px solid var(--rule);border-radius:2px;overflow:hidden}
+.bar-fill{height:100%;background:repeating-linear-gradient(45deg,var(--bar-color,var(--ink)) 0 7px,color-mix(in srgb,var(--bar-color,var(--ink)) 70%,black) 7px 14px);transition:width 400ms cubic-bezier(.2,.8,.2,1)}
+.bar-fill.lead{background:repeating-linear-gradient(45deg,var(--stamp) 0 7px,var(--stamp-2) 7px 14px)}
+.bar-row:nth-child(6n+1){--bar-color:var(--accent-sky)}.bar-row:nth-child(6n+2){--bar-color:var(--accent-emerald)}.bar-row:nth-child(6n+3){--bar-color:var(--accent-saffron)}.bar-row:nth-child(6n+4){--bar-color:var(--accent-magenta)}.bar-row:nth-child(6n+5){--bar-color:var(--accent-violet)}.bar-row:nth-child(6n+6){--bar-color:var(--ink-2)}
+.bar-symbol svg{width:26px;height:26px;color:var(--bar-color,var(--ink))}
+.bar-count{font-family:var(--mono);font-size:14px;text-align:right;font-weight:600}
+.modal-backdrop{position:fixed;inset:0;background:rgba(20,33,61,0.55);backdrop-filter:blur(2px);display:grid;place-items:center;z-index:1000;padding:20px;animation:fadeIn 180ms}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal{background:linear-gradient(180deg,var(--paper-4),var(--paper-3));border:2px solid var(--rule);border-radius:2px;width:100%;max-width:680px;max-height:92vh;overflow:auto;position:relative;box-shadow:var(--shadow-lg);animation:modalIn 220ms cubic-bezier(.2,.8,.2,1)}
+@keyframes modalIn{from{transform:translateY(20px) scale(0.98);opacity:0}to{transform:none;opacity:1}}
+.modal::before{content:"";position:absolute;inset:8px;border:1px solid var(--rule);pointer-events:none;opacity:0.5}
+.modal-inner{padding:32px 36px;position:relative;z-index:1}
+.modal-h{display:flex;justify-content:space-between;align-items:center;border-bottom:1.5px solid var(--rule);padding-bottom:14px;margin-bottom:22px}
+.modal-h h3{font-size:28px}
+.x-btn{background:transparent;border:none;cursor:pointer;font-family:var(--mono);font-size:11px;font-weight:500;color:var(--ink-2);text-transform:uppercase;letter-spacing:0.18em}
+.x-btn:hover{color:var(--stamp)}
+.symbol-picker{display:grid;grid-template-columns:repeat(8,1fr);gap:7px;margin-top:10px}
+.symbol-opt{aspect-ratio:1;border:1.5px solid var(--rule);background:var(--paper-4);display:grid;place-items:center;cursor:pointer;border-radius:2px;transition:all 140ms}
+.symbol-opt:hover{background:var(--paper-2);transform:translateY(-1px)}
+.symbol-opt.selected{background:var(--stamp);border-color:var(--stamp);box-shadow:0 0 0 2px var(--paper-4),0 0 0 3.5px var(--stamp)}
+.symbol-opt.selected svg{color:var(--paper-4)}
+.symbol-opt svg{width:30px;height:30px;color:var(--ink);transition:color 120ms}
+.image-slot{border:1.5px dashed var(--rule);background:var(--paper-4);display:grid;place-items:center;aspect-ratio:1;width:100%;cursor:pointer;color:var(--ink-3);font-family:var(--mono);font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:0.18em;text-align:center;padding:10px;position:relative;overflow:hidden;transition:all 140ms}
+.image-slot img{width:100%;height:100%;object-fit:cover}
+.image-slot:hover{border-color:var(--stamp);color:var(--stamp);background:rgba(139,31,47,0.04)}
+.lock-card{max-width:460px}
+.lock-inner{padding:48px 44px;text-align:center}
+.lock-icon{width:80px;height:80px;margin:0 auto 18px;border:2.5px solid var(--stamp);border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle,rgba(224,37,56,0.1),transparent 70%);color:var(--stamp);position:relative}
+.lock-icon::after{content:"";position:absolute;inset:-8px;border:1.5px dashed var(--stamp);border-radius:50%;opacity:0.5}
+.lock-shake{animation:shake 360ms}
+@keyframes shake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(4px)}30%,50%,70%{transform:translateX(-6px)}40%,60%{transform:translateX(6px)}}
+.lock-pw-input{font-family:var(--mono);font-size:18px;letter-spacing:0.32em;text-align:center;padding:16px}
+.lock-hint{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:0.2em;color:var(--ink-3);margin-top:14px;display:flex;align-items:center;justify-content:center;gap:8px}
+.lock-err{color:var(--stamp);font-family:var(--mono);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.18em;margin-top:10px;display:flex;align-items:center;justify-content:center;gap:8px}
+.welcome{display:grid;place-items:center;min-height:calc(100vh - 110px);padding:40px 20px;position:relative}
+.welcome-card{background:linear-gradient(180deg,var(--paper-4),var(--paper-3));border:2px solid var(--rule);border-radius:2px;max-width:760px;width:100%;position:relative;box-shadow:var(--shadow-lg);z-index:1}
+.welcome-card::before{content:"";position:absolute;inset:8px;border:1px solid var(--rule);pointer-events:none;opacity:0.7}
+.welcome-card::after{content:"";position:absolute;inset:14px;border:1px dashed rgba(20,33,61,0.18);pointer-events:none}
+.welcome-inner{padding:64px 72px;text-align:center;position:relative;z-index:1}
+.welcome-eyebrow{font-family:var(--mono);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.32em;color:var(--stamp);display:inline-flex;align-items:center;gap:14px}
+.welcome-eyebrow::before,.welcome-eyebrow::after{content:"";width:26px;height:1px;background:var(--stamp)}
+.welcome h1{font-size:64px;line-height:0.98;margin-top:16px}
+.welcome .scroll{font-family:var(--serif-text);font-style:italic;color:var(--ink-2);margin-top:20px;font-size:18px;line-height:1.5}
+.welcome-actions{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:40px}
+.action-card{border:2px solid var(--rule);background:var(--paper-4);padding:26px 24px;text-align:left;cursor:pointer;font-family:inherit;color:inherit;border-radius:2px;transition:all 180ms;position:relative;overflow:hidden}
+.action-card:nth-child(1){--ac-accent:var(--stamp)}.action-card:nth-child(2){--ac-accent:var(--accent-emerald)}
+.action-card::before{content:"";position:absolute;top:-50px;right:-50px;width:160px;height:160px;border-radius:50%;background:var(--ac-accent,var(--ink));opacity:0.1;transition:all 280ms}
+.action-card::after{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--ac-accent,var(--ink));transition:all 200ms}
+.action-card:hover{background:var(--ac-accent,var(--ink));color:var(--paper-4);border-color:var(--ac-accent,var(--ink));transform:translateY(-3px);box-shadow:0 6px 0 color-mix(in srgb,var(--ac-accent) 60%,black),0 20px 36px rgba(0,0,0,0.18)}
+.action-card:hover::before{background:var(--paper-4);opacity:0.18;transform:scale(1.6)}.action-card:hover::after{width:100%;opacity:0}
+.action-card .ac-eye{font-family:var(--mono);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.22em;opacity:0.65;display:inline-flex;align-items:center;gap:8px}
+.action-card .ac-eye::before{content:"";width:14px;height:1px;background:currentColor}
+.action-card .ac-h{font-family:var(--serif);font-size:30px;margin-top:10px;line-height:1.05}
+.action-card .ac-desc{font-family:var(--serif-text);font-size:13px;margin-top:8px;opacity:0.78;line-height:1.45;font-style:italic}
+.action-card .ac-arrow{position:absolute;bottom:18px;right:18px;width:32px;height:32px;border:1.5px solid currentColor;border-radius:50%;display:grid;place-items:center;opacity:0.6;transition:all 180ms}
+.action-card:hover .ac-arrow{opacity:1;transform:translateX(3px)}
+.watermark{position:absolute;inset:0;pointer-events:none;display:grid;place-items:center;opacity:0.04;z-index:0;overflow:hidden}
+.watermark .wm-text{font-family:var(--serif);font-size:150px;white-space:nowrap;transform:rotate(-22deg)}
+.done-card{text-align:center;padding:56px 48px}
+.done-seal{width:200px;height:200px;border:5px double var(--stamp);border-radius:50%;margin:0 auto 28px;display:grid;place-items:center;color:var(--stamp);font-family:var(--mono);text-transform:uppercase;letter-spacing:0.22em;font-size:11px;font-weight:600;transform:rotate(-8deg);position:relative;background:radial-gradient(circle at center,rgba(139,31,47,0.06) 30%,transparent 70%);animation:sealStamp 600ms cubic-bezier(.34,1.6,.64,1) backwards}
+@keyframes sealStamp{from{transform:rotate(-30deg) scale(2);opacity:0}to{transform:rotate(-8deg) scale(1);opacity:1}}
+.done-seal::before{content:"";position:absolute;inset:10px;border:1.5px solid var(--stamp);border-radius:50%}
+.done-seal::after{content:"";position:absolute;inset:-14px;border:1.5px dashed var(--stamp);border-radius:50%;opacity:0.4;animation:spin 60s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.done-seal-inner{line-height:1.4;position:relative;z-index:1}
+.done-seal-inner .big{font-family:var(--serif);font-size:40px;letter-spacing:0;text-transform:none;display:block;margin:4px 0 2px}
+.ico{width:16px;height:16px;flex-shrink:0}
+.toggle{display:inline-flex;align-items:center;gap:12px;cursor:pointer}
+.toggle-track{width:48px;height:26px;border:1.5px solid var(--rule);background:var(--paper-4);border-radius:999px;position:relative;transition:all 160ms}
+.toggle-track::after{content:"";position:absolute;width:18px;height:18px;background:var(--ink);border-radius:50%;top:2px;left:2px;transition:all 180ms cubic-bezier(.2,.8,.2,1)}
+.toggle.on .toggle-track{background:var(--tick);border-color:var(--tick)}
+.toggle.on .toggle-track::after{left:24px;background:var(--paper-4)}
+.empty{text-align:center;padding:56px 24px;color:var(--ink-3);border:1.5px dashed var(--rule);border-radius:2px;background:var(--paper-4)}
+.empty h4{font-size:26px;color:var(--ink);margin-bottom:8px}
+.empty p{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:0.18em;margin:8px 0 20px}
+.receipt{display:inline-grid;grid-template-columns:auto auto;gap:8px 32px;font-family:var(--mono);font-size:13px;text-align:left;background:var(--paper-4);border:1.5px solid var(--rule);padding:22px 28px;border-radius:2px;position:relative}
+.receipt::before,.receipt::after{content:"";position:absolute;width:24px;height:24px;border:1.5px solid var(--rule);background:var(--paper);border-radius:50%}
+.receipt::before{top:-12px;left:50%;transform:translateX(-50%)}.receipt::after{bottom:-12px;left:50%;transform:translateX(-50%)}
+.receipt .lbl{color:var(--ink-3);text-transform:uppercase;letter-spacing:0.18em;font-size:10px;font-weight:600}
+.loading-overlay{position:fixed;inset:0;background:rgba(255,244,214,0.85);display:grid;place-items:center;z-index:9999;backdrop-filter:blur(4px)}
+.loading-spinner{width:48px;height:48px;border:3px solid var(--paper-2);border-top-color:var(--ink);border-radius:50%;animation:spin 0.8s linear infinite}
+@media(max-width:760px){
+  .row-2{grid-template-columns:1fr}.ballot-grid{grid-template-columns:1fr}.stat-grid{grid-template-columns:1fr 1fr}
+  .admin-shell{grid-template-columns:1fr}.admin-nav{position:static}.sheet-inner{padding:28px 22px}
+  .welcome-inner{padding:42px 24px}.welcome h1{font-size:42px}.sheet-title h2{font-size:32px}
+  .house-grid{grid-template-columns:1fr}.symbol-picker{grid-template-columns:repeat(6,1fr)}
+  .candidate-card{grid-template-columns:56px 1fr 56px}.candidate-name{font-size:20px}
+  .welcome-actions{grid-template-columns:1fr}.stat .val{font-size:36px}.admin-h h2{font-size:26px}
 }
 </style>
 </head>
 <body>
 <div id="root"></div>
-
 <script type="text/babel">
-// ============================================================
-// DATA
-// ============================================================
-const HOUSES = [
-  { id: "sargas",  name: "Sargas",  color: "#1e8c3a", desc: "Green · Heart of Scorpius" },
-  { id: "sirius",  name: "Sirius",  color: "#e02538", desc: "Red · The Dog Star" },
-  { id: "pollux",  name: "Pollux",  color: "#1a56b0", desc: "Blue · The Twin" },
-  { id: "deneb",   name: "Deneb",   color: "#f5c800", desc: "Yellow · Tail of the Swan" },
-];
+// ─── Supabase client ────────────────────────────────────────────────────────
+const SUPABASE_URL = "https://kmgipsafwcsymffoqvvc.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImttZ2lwc2Fmd2NzeW1mZm9xdnZjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5MDU2MzUsImV4cCI6MjA5NTQ4MTYzNX0.zAMPCq-4Vz6n1VaLJMw9eCDmjZ5o3wnnqpLWehm1bSY";
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const CLASSES = (() => {
-  const arr = [];
-  for (let g = 6; g <= 12; g++) {
-    for (const s of ["A", "B"]) arr.push(`${g}-${s}`);
-  }
-  return arr;
-})();
-
+// ─── Static data ─────────────────────────────────────────────────────────────
 const ROLES = [
-  { id: "sc_b",  label: "School Captain",       gender: "Boy",  scope: "school" },
-  { id: "sc_g",  label: "School Captain",       gender: "Girl", scope: "school" },
-  { id: "vsc_b", label: "Vice / Chief Captain", gender: "Boy",  scope: "school" },
-  { id: "vsc_g", label: "Vice / Chief Captain", gender: "Girl", scope: "school" },
-  { id: "hc",    label: "House Captain",        gender: null,   scope: "house" },
-  { id: "vhc",   label: "Vice House Captain",   gender: null,   scope: "house" },
-  { id: "cp",    label: "Class Prefect",        gender: null,   scope: "class" },
+  { id:"sc_b",  label:"School Captain",       gender:"Boy",  scope:"school" },
+  { id:"sc_g",  label:"School Captain",       gender:"Girl", scope:"school" },
+  { id:"vsc_b", label:"Vice / Chief Captain", gender:"Boy",  scope:"school" },
+  { id:"vsc_g", label:"Vice / Chief Captain", gender:"Girl", scope:"school" },
+  { id:"hc",    label:"House Captain",        gender:null,   scope:"house"  },
+  { id:"vhc",   label:"Vice House Captain",   gender:null,   scope:"house"  },
+  { id:"cp",    label:"Class Prefect",        gender:null,   scope:"class"  },
 ];
 
 const SYMBOLS = {
@@ -396,90 +294,36 @@ const SYMBOLS = {
   lamp:     '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 21h12v-2H6v2zm6-19c-3.3 0-6 2.7-6 6 0 2.3 1.3 4.3 3.3 5.3V17h5.5v-3.7C16.7 12.3 18 10.3 18 8c0-3.3-2.7-6-6-6z"/></svg>',
   anchor:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="2"/><path d="M12 7v15M7 12h10M5 17a7 7 0 0 0 14 0"/></svg>',
   key:      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="7" cy="12" r="4"/><path d="M11 12h11M17 12v4M21 12v3"/></svg>',
-  book:     '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h7v16H4zM13 4h7v16h-7z"/><path d="M6 7h3M6 10h3M15 7h3M15 10h3" stroke="rgba(241,231,210,0.7)" stroke-width="1.4"/></svg>',
+  book:     '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h7v16H4zM13 4h7v16h-7z"/></svg>',
   pen:      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3 21l4-1L20 7l-3-3L4 17z"/><path d="M14 6l3 3"/></svg>',
   sun:      '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4"/><g stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></g></svg>',
   moon:     '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 14A8 8 0 1 1 10 4a7 7 0 0 0 10 10z"/></svg>',
-  leaf:     '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 19c0-9 7-15 16-15 0 9-6 16-15 16-1 0-1-1-1-1z"/><path d="M5 19L14 10" stroke="rgba(241,231,210,0.8)" stroke-width="1.5" fill="none"/></svg>',
+  leaf:     '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 19c0-9 7-15 16-15 0 9-6 16-15 16-1 0-1-1-1-1z"/></svg>',
   flower:   '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="6" r="3"/><circle cx="12" cy="18" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="12" r="3"/><circle cx="12" cy="12" r="2.4" fill="rgba(241,231,210,0.85)"/></svg>',
   tree:     '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l5 7h-3l4 6h-4l3 4H7l3-4H6l4-6H7z"/><path d="M11 19h2v3h-2z"/></svg>',
-  fish:     '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 12c4-6 12-6 16 0-4 6-12 6-16 0z"/><circle cx="15" cy="11" r="1" fill="rgba(241,231,210,0.85)"/><path d="M19 12l3-3v6z"/></svg>',
-  bird:     '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 4c-4 0-7 2-9 5L8 8 4 12c0 5 4 8 9 8 6 0 9-4 9-10V4z"/><circle cx="18" cy="7" r="0.8" fill="rgba(241,231,210,0.85)"/></svg>',
+  fish:     '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 12c4-6 12-6 16 0-4 6-12 6-16 0z"/><path d="M19 12l3-3v6z"/></svg>',
+  bird:     '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 4c-4 0-7 2-9 5L8 8 4 12c0 5 4 8 9 8 6 0 9-4 9-10V4z"/></svg>',
   bell:     '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c-1 0-2 .9-2 2v.4C7 5.2 5 7.9 5 11v4l-2 2v1h18v-1l-2-2v-4c0-3.1-2-5.8-5-6.6V4c0-1.1-1-2-2-2zM10 21a2 2 0 0 0 4 0z"/></svg>',
   flag:     '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 2v20h2v-8h12L17 8l2-6H7V2z"/></svg>',
-  shield:   '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5z"/><path d="M9 12l2 2 4-4" stroke="rgba(241,231,210,0.9)" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>',
+  shield:   '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5z"/></svg>',
   scroll:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 4h12v14H8a3 3 0 0 1-3-3V4z"/><path d="M17 4h2v11a3 3 0 0 1-3 3"/></svg>',
-  feather:  '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 3c-7 0-13 4-13 11v3l-4 4 2 2 4-4h3c7 0 11-6 11-13z"/><path d="M9 14l8-8" stroke="rgba(241,231,210,0.8)" stroke-width="1.4" fill="none"/></svg>',
+  feather:  '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 3c-7 0-13 4-13 11v3l-4 4 2 2 4-4h3c7 0 11-6 11-13z"/></svg>',
   globe:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>',
-  diamond:  '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 3h12l4 6-10 12L2 9z"/><path d="M6 3l3 6h6l3-6M2 9h20" stroke="rgba(241,231,210,0.7)" stroke-width="1.2" fill="none"/></svg>',
+  diamond:  '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 3h12l4 6-10 12L2 9z"/></svg>',
   crown:    '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 7l4 4 6-7 6 7 4-4v12H2zM2 20h20v2H2z"/></svg>',
   compass:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 6l3 9-9-3 9-3-3 9z" fill="currentColor"/></svg>',
-  drum:     '<svg viewBox="0 0 24 24" fill="currentColor"><ellipse cx="12" cy="6" rx="9" ry="3"/><path d="M3 6v12c0 1.7 4 3 9 3s9-1.3 9-3V6"/><ellipse cx="12" cy="18" rx="9" ry="3" fill="rgba(241,231,210,0.2)" stroke="currentColor" stroke-width="1"/></svg>',
-  mountain: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 21l7-12 4 6 3-5 6 11z"/><path d="M8 13l2-3" stroke="rgba(241,231,210,0.7)" stroke-width="1.2" fill="none"/></svg>',
+  drum:     '<svg viewBox="0 0 24 24" fill="currentColor"><ellipse cx="12" cy="6" rx="9" ry="3"/><path d="M3 6v12c0 1.7 4 3 9 3s9-1.3 9-3V6"/></svg>',
+  mountain: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 21l7-12 4 6 3-5 6 11z"/></svg>',
 };
 const SYMBOL_KEYS = Object.keys(SYMBOLS);
 
-const seedCandidates = () => {
-  const c = []; let id = 1;
-  const mk = (name, role, gender, house, klass, sym) => ({ id: "c"+(id++), name, role, gender, house, klass, symbol: sym });
-  c.push(mk("Aarav Sharma","sc_b","Boy",null,null,"star"));
-  c.push(mk("Reyansh Gurung","sc_b","Boy",null,null,"compass"));
-  c.push(mk("Vihaan Thapa","sc_b","Boy",null,null,"shield"));
-  c.push(mk("Anaisha Rai","sc_g","Girl",null,null,"flower"));
-  c.push(mk("Saanvi Karki","sc_g","Girl",null,null,"moon"));
-  c.push(mk("Mira Pradhan","sc_g","Girl",null,null,"sun"));
-  c.push(mk("Kabir Limbu","vsc_b","Boy",null,null,"feather"));
-  c.push(mk("Arjun Basnet","vsc_b","Boy",null,null,"anchor"));
-  c.push(mk("Ishita Subba","vsc_g","Girl",null,null,"bird"));
-  c.push(mk("Pari Adhikari","vsc_g","Girl",null,null,"leaf"));
-  const hcPairs = { sargas:[["Rohan Khadka","lamp"],["Diya Tamang","diamond"]], sirius:[["Aryan Magar","key"],["Nisha Bhattarai","fish"]], pollux:[["Sahil Joshi","crown"],["Tara Shrestha","bell"]], deneb:[["Rishi Chettri","tree"],["Aanya Dahal","flag"]] };
-  for (const h of HOUSES) for (const [nm,sym] of hcPairs[h.id]) c.push(mk(nm,"hc",null,h.id,null,sym));
-  const vhcPairs = { sargas:[["Niraj Bhandari","drum"],["Priya Lama","mountain"]], sirius:[["Aakash Rana","globe"],["Riya Maharjan","scroll"]], pollux:[["Yash Acharya","pen"],["Krisha Sapkota","book"]], deneb:[["Manish Poudel","tree"],["Sneha Khatri","leaf"]] };
-  for (const h of HOUSES) for (const [nm,sym] of vhcPairs[h.id]) c.push(mk(nm,"vhc",null,h.id,null,sym));
-  const cp = [["6-A",["Arnav Shahi","star"],["Esha Mishra","flower"]],["6-B",["Pranav K.C.","key"],["Ritika Bista","moon"]],["7-A",["Yuvraj Oli","shield"],["Anvi Joshi","leaf"]],["8-B",["Devansh Pun","anchor"],["Khushi Gauli","bell"]],["10-A",["Aditya Shahi","compass"],["Trisha Pant","diamond"]],["12-A",["Ronak Bhusal","crown"],["Aaradhya Niraula","feather"]],["12-B",["Sushant Karki","drum"],["Bipasha Khatri","bird"]]];
-  for (const [kls,a,b] of cp) { c.push(mk(a[0],"cp",null,null,kls,a[1])); c.push(mk(b[0],"cp",null,null,kls,b[1])); }
-  return c;
-};
+// ─── Shared UI ───────────────────────────────────────────────────────────────
+const { useState, useEffect, useRef, useMemo, useCallback } = React;
 
-window.DPSData = { HOUSES, CLASSES, ROLES, SYMBOLS, SYMBOL_KEYS, seedCandidates };
-
-// ============================================================
-// SHARED COMPONENTS
-// ============================================================
-const { useState, useEffect, useRef, useMemo } = React;
-
-const BallotSymbol = ({ name, className }) => {
-  const svg = SYMBOLS[name] || SYMBOLS.star;
-  return <span className={className||""} style={{display:"inline-flex",alignItems:"center",justifyContent:"center"}} dangerouslySetInnerHTML={{__html: svg}} />;
-};
-
-const Crest = ({ size = 64 }) => {
-  const leafL = [], leafR = [];
-  for (let i = 0; i < 8; i++) {
-    const aL = (i / 8) * Math.PI - Math.PI / 2 - 0.2;
-    leafL.push({ a: aL, cx: 40 + Math.cos(aL)*30, cy: 40 + Math.sin(aL)*30 });
-    const aR = (i / 8) * Math.PI + Math.PI / 2 + 0.2;
-    leafR.push({ a: aR, cx: 40 + Math.cos(aR)*30, cy: 40 + Math.sin(aR)*30 });
-  }
-  return (
-    <svg viewBox="0 0 80 80" width={size} height={size} aria-hidden="true">
-      <g fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
-        <path d="M14 40c0-14 12-26 26-26s26 12 26 26" opacity="0.5"/>
-        <path d="M14 40c0 14 12 26 26 26s26-12 26-26" opacity="0.5"/>
-        {leafL.map((p,i) => <ellipse key={"l"+i} cx={p.cx} cy={p.cy} rx="3.6" ry="1.9" transform={`rotate(${(p.a*180/Math.PI)+90} ${p.cx} ${p.cy})`} fill="currentColor" opacity="0.85" stroke="none"/>)}
-        {leafR.map((p,i) => <ellipse key={"r"+i} cx={p.cx} cy={p.cy} rx="3.6" ry="1.9" transform={`rotate(${(p.a*180/Math.PI)+90} ${p.cx} ${p.cy})`} fill="currentColor" opacity="0.85" stroke="none"/>)}
-      </g>
-      <path d="M40 18 L58 24 V42 C58 52 50 60 40 64 C30 60 22 52 22 42 V24 Z" fill="currentColor" fillOpacity="0.08" stroke="currentColor" strokeWidth="1.8"/>
-      <path d="M22 36 L58 36" stroke="currentColor" strokeWidth="1" opacity="0.45"/>
-      <text x="40" y="34" textAnchor="middle" fontFamily="DM Serif Display, serif" fontSize="13" fill="currentColor" letterSpacing="0.5">DPS</text>
-      <g transform="translate(40 48)">
-        <path d="M0 -7 L1.6 -2.2 L6.7 -2.2 L2.6 0.8 L4.1 5.7 L0 2.7 L-4.1 5.7 L-2.6 0.8 L-6.7 -2.2 L-1.6 -2.2 Z" fill="currentColor"/>
-      </g>
-      <path d="M16 60 L40 66 L64 60 L60 72 L40 70 L20 72 Z" fill="currentColor" opacity="0.9"/>
-      <text x="40" y="68.5" textAnchor="middle" fontFamily="IBM Plex Mono, monospace" fontSize="4.5" fill="var(--paper-4)" letterSpacing="1.4">EST · MMV</text>
-    </svg>
-  );
-};
+const BallotSymbol = ({ name, className }) => (
+  <span className={className||""} style={{display:"inline-flex",alignItems:"center",justifyContent:"center"}}
+    dangerouslySetInnerHTML={{__html: SYMBOLS[name] || SYMBOLS.star}} />
+);
 
 const CornerOrnament = () => (
   <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round">
@@ -490,391 +334,261 @@ const CornerOrnament = () => (
     <path d="M18 18 L24 24" opacity="0.4"/>
   </svg>
 );
-
-const SheetCorners = () => (
-  <>
-    <div className="corner tl"><CornerOrnament/></div>
-    <div className="corner tr"><CornerOrnament/></div>
-    <div className="corner bl"><CornerOrnament/></div>
-    <div className="corner br"><CornerOrnament/></div>
-  </>
+const SheetCorners = () => (<><div className="corner tl"><CornerOrnament/></div><div className="corner tr"><CornerOrnament/></div><div className="corner bl"><CornerOrnament/></div><div className="corner br"><CornerOrnament/></div></>);
+const Watermark = ({ text="DPS \u2022 OFFICIAL BALLOT" }) => (<div className="watermark"><div className="wm-text">{text}</div></div>);
+const RuleOrn = () => <div className="rule-orn"><span className="dot"/></div>;
+const Chip = ({ children, variant }) => (<span className={"chip"+(variant?" "+variant:"")}>{variant!=="stamp"&&variant!=="tick"&&<span className="chip-dot"/>}{children}</span>);
+const Toggle = ({ checked, onChange, label }) => (<button className={"toggle "+(checked?"on":"")} onClick={()=>onChange(!checked)} style={{background:"transparent",border:"none",padding:0,cursor:"pointer"}}><span className="toggle-track"/><span style={{fontFamily:"var(--mono)",fontSize:11,textTransform:"uppercase",letterSpacing:"0.14em",color:checked?"var(--tick)":"var(--ink-3)"}}>{label}</span></button>);
+const Stepper = ({ steps, currentIndex }) => (<div className="stepper">{steps.map((s,i)=>(<div key={i} className={"stepper-item "+(i<currentIndex?"done ":"")+(i===currentIndex?"active":"")}>{String(i+1).padStart(2,"0")} · {s}</div>))}</div>);
+const Modal = ({ title, onClose, children, footer }) => (
+  <div className="modal-backdrop" onClick={onClose}>
+    <div className="modal" onClick={e=>e.stopPropagation()}>
+      <div className="modal-inner">
+        <div className="modal-h"><h3>{title}</h3><button className="x-btn" onClick={onClose}>\u2715 Close</button></div>
+        {children}
+        {footer&&<div style={{marginTop:22,paddingTop:16,borderTop:"1.5px solid var(--rule)",display:"flex",gap:10,justifyContent:"flex-end"}}>{footer}</div>}
+      </div>
+    </div>
+  </div>
 );
-
 const Letterhead = ({ subtitle, right }) => {
-  const today = new Date().toLocaleDateString("en-GB", { day:"2-digit", month:"short", year:"numeric" }).toUpperCase();
-  const serial = useMemo(() => "DPS/EC/26/" + String(Math.floor(Math.random()*9000)+1000), []);
+  const today = new Date().toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"}).toUpperCase();
+  const serial = useMemo(()=>"DPS/EC/26/"+String(Math.floor(Math.random()*9000)+1000),[]);
   return (
     <header className="letterhead">
-      <div className="letterhead-left">
-        <div>
-          <h1>DPS Biratnagar</h1>
-          <div className="sub">{subtitle || "Student Council Election — 2026"}</div>
-        </div>
-      </div>
-      <div className="letterhead-right">
-        {right || (<><div>Serial · {serial}</div><div style={{fontSize:12,color:"var(--ink)",marginTop:4,letterSpacing:"0.14em"}}>{today}</div></>)}
-      </div>
+      <div className="letterhead-left"><div><h1>DPS Biratnagar</h1><div className="sub">{subtitle||"Student Council Election — 2026"}</div></div></div>
+      <div className="letterhead-right">{right||(<><div>Serial · {serial}</div><div style={{fontSize:12,color:"var(--ink)",marginTop:4,letterSpacing:"0.14em"}}>{today}</div></>)}</div>
     </header>
   );
 };
-
-const Watermark = ({ text = "DPS \u2022 OFFICIAL BALLOT" }) => (
-  <div className="watermark"><div className="wm-text">{text}</div></div>
-);
-
-const RuleOrn = () => <div className="rule-orn"><span className="dot"/></div>;
-
-const Stepper = ({ steps, currentIndex }) => (
-  <div className="stepper">
-    {steps.map((s,i) => (
-      <div key={i} className={"stepper-item " + (i < currentIndex ? "done " : "") + (i === currentIndex ? "active" : "")}>
-        {String(i+1).padStart(2,"0")} · {s}
-      </div>
-    ))}
-  </div>
-);
-
-const Chip = ({ children, variant }) => (
-  <span className={"chip" + (variant ? " "+variant : "")}>
-    {variant !== "stamp" && variant !== "tick" && <span className="chip-dot"/>}
-    {children}
-  </span>
-);
-
-const Toggle = ({ checked, onChange, label }) => (
-  <button className={"toggle "+(checked?"on":"")} onClick={() => onChange(!checked)} style={{background:"transparent",border:"none",padding:0,cursor:"pointer"}}>
-    <span className="toggle-track"/>
-    <span style={{fontFamily:"var(--mono)",fontSize:11,textTransform:"uppercase",letterSpacing:"0.14em",color:checked?"var(--tick)":"var(--ink-3)"}}>{label}</span>
-  </button>
-);
-
-const Modal = ({ title, onClose, children, footer }) => (
-  <div className="modal-backdrop" onClick={onClose}>
-    <div className="modal" onClick={e => e.stopPropagation()}>
-      <div className="modal-inner">
-        <div className="modal-h">
-          <h3>{title}</h3>
-          <button className="x-btn" onClick={onClose}>\u2715 Close</button>
-        </div>
-        {children}
-        {footer && <div style={{marginTop:22,paddingTop:16,borderTop:"1.5px solid var(--rule)",display:"flex",gap:10,justifyContent:"flex-end"}}>{footer}</div>}
-      </div>
+const LoadingOverlay = ({ msg="Loading…" }) => (
+  <div className="loading-overlay">
+    <div style={{textAlign:"center"}}>
+      <div className="loading-spinner" style={{margin:"0 auto 16px"}}/>
+      <div style={{fontFamily:"var(--mono)",fontSize:11,textTransform:"uppercase",letterSpacing:"0.22em",color:"var(--ink-3)"}}>{msg}</div>
     </div>
   </div>
 );
 
-const useLocalState = (key, initial) => {
-  const [val, setVal] = useState(() => {
-    try {
-      const raw = localStorage.getItem(key);
-      if (raw == null) return typeof initial === "function" ? initial() : initial;
-      return JSON.parse(raw);
-    } catch { return typeof initial === "function" ? initial() : initial; }
-  });
-  useEffect(() => {
-    try { localStorage.setItem(key, JSON.stringify(val)); } catch {}
-  }, [key, val]);
-  return [val, setVal];
-};
-
-// ============================================================
-// ADMIN LOCK
-// ============================================================
-const LockIcon = () => (
-  <svg viewBox="0 0 32 32" width="36" height="36" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="6" y="14" width="20" height="14" rx="2"/>
-    <path d="M10 14V10a6 6 0 0 1 12 0v4"/>
-    <circle cx="16" cy="21" r="1.5" fill="currentColor"/>
-    <path d="M16 22.5v2.5"/>
-  </svg>
-);
-
-const AdminLock = ({ onUnlock, expectedPw }) => {
-  const [pw, setPw] = useState("");
-  const [show, setShow] = useState(false);
-  const [err, setErr] = useState(false);
-  const [shake, setShake] = useState(false);
-  const inputRef = useRef(null);
-  useEffect(() => { setTimeout(() => inputRef.current?.focus(), 60); }, []);
-  const submit = () => {
-    if (pw === expectedPw) { onUnlock(); }
-    else { setErr(true); setShake(true); setTimeout(() => setShake(false), 380); setPw(""); inputRef.current?.focus(); }
+// ─── Admin Lock ───────────────────────────────────────────────────────────────
+const AdminLock = ({ onUnlock }) => {
+  const [pw,setPw]=useState(""); const [show,setShow]=useState(false); const [err,setErr]=useState(false); const [shake,setShake]=useState(false);
+  const inputRef=useRef(null);
+  useEffect(()=>{ setTimeout(()=>inputRef.current?.focus(),60); },[]);
+  const submit = async () => {
+    const { data } = await sb.from("settings").select("value").eq("key","admin_password").single();
+    const expected = data?.value || "dps2026";
+    if (pw===expected) { onUnlock(); }
+    else { setErr(true); setShake(true); setTimeout(()=>setShake(false),380); setPw(""); inputRef.current?.focus(); }
   };
   return (
     <div className="welcome">
-      <div className={"welcome-card lock-card" + (shake ? " lock-shake" : "")}>
-        <SheetCorners/>
-        <Watermark text="RETURNING OFFICER \u00b7 SECURE ACCESS"/>
+      <div className={"welcome-card lock-card"+(shake?" lock-shake":"")}>
+        <SheetCorners/><Watermark text="RETURNING OFFICER \u00b7 SECURE ACCESS"/>
         <div className="lock-inner">
-          <div className="lock-icon"><LockIcon/></div>
+          <div className="lock-icon"><svg viewBox="0 0 32 32" width="36" height="36" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="6" y="14" width="20" height="14" rx="2"/><path d="M10 14V10a6 6 0 0 1 12 0v4"/><circle cx="16" cy="21" r="1.5" fill="currentColor"/><path d="M16 22.5v2.5"/></svg></div>
           <div className="welcome-eyebrow">Restricted Access</div>
           <h1 style={{fontSize:36,marginTop:14}}>Returning Officer<br/>Authentication</h1>
-          <p className="scroll" style={{fontSize:15,marginTop:14}}>
-            This booth is reserved for the Election Commissioner.<br/>
-            Enter the polling station passcode to continue.
-          </p>
+          <p className="scroll" style={{fontSize:15,marginTop:14}}>This booth is reserved for the Election Commissioner.<br/>Enter the polling station passcode to continue.</p>
           <RuleOrn/>
           <div className="field" style={{alignItems:"stretch"}}>
             <label style={{justifyContent:"center"}}>Passcode</label>
-            <input ref={inputRef} className="input lock-pw-input" type={show?"text":"password"} autoComplete="current-password"
-              value={pw} onChange={e => { setPw(e.target.value); setErr(false); }} onKeyDown={e => { if (e.key==="Enter") submit(); }} placeholder="\u2022\u2022\u2022\u2022\u2022\u2022"/>
-            {err && <div className="lock-err">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                <circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16v.5"/>
-              </svg>
-              Incorrect passcode \u00b7 access denied
-            </div>}
+            <input ref={inputRef} className="input lock-pw-input" type={show?"text":"password"} value={pw} onChange={e=>{setPw(e.target.value);setErr(false);}} onKeyDown={e=>{if(e.key==="Enter")submit();}} placeholder="\u2022\u2022\u2022\u2022\u2022\u2022"/>
+            {err&&<div className="lock-err"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16v.5"/></svg>Incorrect passcode \u00b7 access denied</div>}
           </div>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginTop:20,gap:12}}>
-            <button type="button" className="btn-ghost btn btn-sm" onClick={() => setShow(s => !s)} style={{padding:"6px 0"}}>
-              {show?"Hide":"Show"} passcode
-            </button>
+            <button className="btn-ghost btn btn-sm" onClick={()=>setShow(s=>!s)} style={{padding:"6px 0"}}>{show?"Hide":"Show"} passcode</button>
             <button className="btn btn-stamp" onClick={submit} disabled={!pw}>Authenticate \u2192</button>
           </div>
-          <div className="lock-hint">
-            <span style={{width:6,height:6,borderRadius:"50%",background:"var(--seal)"}}/>
-            Default passcode: <strong style={{color:"var(--ink)",letterSpacing:"0.18em"}}>dps2026</strong>
-          </div>
+          <div className="lock-hint"><span style={{width:6,height:6,borderRadius:"50%",background:"var(--seal)"}}/>Default passcode: <strong style={{color:"var(--ink)",letterSpacing:"0.18em"}}>dps2026</strong></div>
         </div>
       </div>
     </div>
   );
 };
 
-// ============================================================
-// STUDENT FLOW
-// ============================================================
-const StudentApp = ({ candidates, votingOpen, onSubmitVote, hasVoted }) => {
-  const [step, setStep] = useState("welcome");
-  const [name, setName] = useState("");
-  const [klass, setKlass] = useState("");
-  const [house, setHouse] = useState(null);
-  const [picks, setPicks] = useState({});
-  const [roleIdx, setRoleIdx] = useState(0);
+// ─── Student Flow ─────────────────────────────────────────────────────────────
+const StudentApp = ({ candidates, houses, classes, votingOpen, onSubmitVote, checkHasVoted }) => {
+  const [step,setStep]=useState("welcome");
+  const [name,setName]=useState(""); const [klass,setKlass]=useState(""); const [house,setHouse]=useState(null);
+  const [picks,setPicks]=useState({}); const [roleIdx,setRoleIdx]=useState(0); const [submitting,setSubmitting]=useState(false);
 
-  const stepperSteps = ["Identity", "House", ...ROLES.map(r => r.gender ? `${r.label} (${r.gender[0]})` : r.label)];
-  const stepperIndex = useMemo(() => {
-    if (step === "welcome" || step === "identity") return 0;
-    if (step === "house") return 1;
-    if (step.startsWith("vote:")) return 2 + roleIdx;
-    if (step === "done") return stepperSteps.length;
-    return 0;
-  }, [step, roleIdx]);
+  const stepperSteps=["Identity","House",...ROLES.map(r=>r.gender?`${r.label} (${r.gender[0]})`:r.label)];
+  const stepperIndex=useMemo(()=>{
+    if(step==="welcome"||step==="identity") return 0;
+    if(step==="house") return 1;
+    if(step.startsWith("vote:")) return 2+roleIdx;
+    return stepperSteps.length;
+  },[step,roleIdx]);
 
-  const goToVote = (idx) => { setRoleIdx(idx); setStep("vote:"+idx); };
-  const handleStart = () => setStep("identity");
-  const handleIdentityNext = () => {
-    if (!name.trim() || !klass) return;
-    if (hasVoted(name.trim(), klass)) { setStep("blocked"); return; }
-    setStep("house");
-  };
-  const handleHouseNext = () => { if (!house) return; goToVote(0); };
-
-  const currentRole = ROLES[roleIdx];
-  const candidatesForCurrent = useMemo(() => {
-    if (!currentRole) return [];
-    return candidates.filter(c => {
-      if (c.role !== currentRole.id) return false;
-      if (currentRole.gender && c.gender !== currentRole.gender) return false;
-      if (currentRole.scope === "house" && c.house !== house) return false;
-      if (currentRole.scope === "class" && c.klass !== klass) return false;
+  const goToVote=idx=>{setRoleIdx(idx);setStep("vote:"+idx);};
+  const currentRole=ROLES[roleIdx];
+  const candidatesForCurrent=useMemo(()=>{
+    if(!currentRole) return [];
+    return candidates.filter(c=>{
+      if(c.role!==currentRole.id) return false;
+      if(currentRole.gender&&c.gender!==currentRole.gender) return false;
+      if(currentRole.scope==="house"&&c.house!==house) return false;
+      if(currentRole.scope==="class"&&c.class!==klass) return false;
       return true;
     });
-  }, [candidates, currentRole, house, klass]);
+  },[candidates,currentRole,house,klass]);
 
-  const handlePick = (cid) => setPicks(p => ({...p, [currentRole.id]: cid}));
-  const handleVoteNext = () => {
-    if (!picks[currentRole.id]) return;
-    if (roleIdx < ROLES.length - 1) { goToVote(roleIdx + 1); }
-    else {
-      onSubmitVote({ name: name.trim(), klass, house, picks: {...picks}, ts: Date.now() });
+  const handleIdentityNext=async()=>{
+    if(!name.trim()||!klass) return;
+    const already=await checkHasVoted(name.trim(),klass);
+    if(already){setStep("blocked");return;}
+    setStep("house");
+  };
+
+  const handleVoteNext=async()=>{
+    if(!picks[currentRole.id]) return;
+    if(roleIdx<ROLES.length-1){goToVote(roleIdx+1);}
+    else{
+      setSubmitting(true);
+      await onSubmitVote({voter_name:name.trim(),class:klass,house,picks,ts:Date.now()});
+      setSubmitting(false);
       setStep("done");
     }
   };
-  const handleVoteBack = () => { if (roleIdx === 0) setStep("house"); else goToVote(roleIdx - 1); };
 
-  if (!votingOpen && step === "welcome") return (
-    <div className="welcome">
-      <div className="welcome-card">
-        <Watermark text="POLLS CLOSED"/>
-        <div className="welcome-inner">
-          <div className="welcome-eyebrow">Notice from the Returning Officer</div>
-          <h1>Polling is currently closed.</h1>
-          <p className="scroll">The voting window has not been opened by the Election Commissioner. Please return when polls are open.</p>
-        </div>
+  if(!votingOpen&&step==="welcome") return (
+    <div className="welcome"><div className="welcome-card"><Watermark text="POLLS CLOSED"/>
+      <div className="welcome-inner">
+        <div className="welcome-eyebrow">Notice from the Returning Officer</div>
+        <h1>Polling is currently closed.</h1>
+        <p className="scroll">The voting window has not been opened by the Election Commissioner.</p>
       </div>
-    </div>
+    </div></div>
   );
 
-  if (step === "welcome") return (
-    <div className="welcome">
-      <div className="welcome-card">
-        <Watermark/>
-        <div className="welcome-inner">
-          <div className="welcome-eyebrow">Office of the Returning Officer</div>
-          <h1>Student Council<br/>Election &mdash; 2026</h1>
-          <p className="scroll">You are about to enter an official ballot booth. Cast your votes with care &mdash;<br/>a single ballot will be issued per student, sealed upon submission.</p>
-          <RuleOrn/>
-          <div style={{display:"flex",justifyContent:"center",gap:12,flexWrap:"wrap"}}>
-            <button className="btn btn-stamp" onClick={handleStart}>
-              <svg className="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-              Enter Polling Booth
-            </button>
-          </div>
-          <div style={{marginTop:28,fontFamily:"var(--mono)",fontSize:10,textTransform:"uppercase",letterSpacing:"0.18em",color:"var(--ink-3)"}}>7 ballots \u00b7 4 houses \u00b7 14 classes</div>
+  if(step==="welcome") return (
+    <div className="welcome"><div className="welcome-card"><Watermark/>
+      <div className="welcome-inner">
+        <div className="welcome-eyebrow">Office of the Returning Officer</div>
+        <h1>Student Council<br/>Election &mdash; 2026</h1>
+        <p className="scroll">You are about to enter an official ballot booth. Cast your votes with care &mdash;<br/>a single ballot will be issued per student, sealed upon submission.</p>
+        <RuleOrn/>
+        <div style={{display:"flex",justifyContent:"center",gap:12}}>
+          <button className="btn btn-stamp" onClick={()=>setStep("identity")}>
+            <svg className="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>Enter Polling Booth
+          </button>
         </div>
+        <div style={{marginTop:28,fontFamily:"var(--mono)",fontSize:10,textTransform:"uppercase",letterSpacing:"0.18em",color:"var(--ink-3)"}}>7 ballots · 4 houses · {classes.length} classes</div>
       </div>
-    </div>
+    </div></div>
   );
 
-  if (step === "blocked") return (
-    <div className="stage">
-      <div className="sheet"><SheetCorners/>
-        <div className="sheet-inner" style={{textAlign:"center"}}>
-          <div className="sheet-title">
-            <div className="eyebrow">Ballot Refused</div>
-            <h2>You have already voted.</h2>
-            <p className="desc">Our records show <strong>{name}</strong> from class <strong>{klass}</strong> has already cast a ballot. Each student may vote only once.</p>
-          </div>
-          <RuleOrn/>
-          <button className="btn btn-primary" onClick={() => { setStep("identity"); setName(""); setKlass(""); }}>\u2190 Return to Identity</button>
-        </div>
+  if(step==="blocked") return (
+    <div className="stage"><div className="sheet"><SheetCorners/>
+      <div className="sheet-inner" style={{textAlign:"center"}}>
+        <div className="sheet-title"><div className="eyebrow">Ballot Refused</div><h2>You have already voted.</h2><p className="desc">Our records show <strong>{name}</strong> from class <strong>{klass}</strong> has already cast a ballot.</p></div>
+        <RuleOrn/>
+        <button className="btn btn-primary" onClick={()=>{setStep("identity");setName("");setKlass("");}}>← Return to Identity</button>
       </div>
-    </div>
+    </div></div>
   );
 
-  if (step === "done") {
-    const receiptNo = "DPS-" + Math.random().toString(36).slice(2,8).toUpperCase();
-    const houseName = HOUSES.find(h => h.id === house)?.name;
+  if(step==="done"){
+    const receiptNo="DPS-"+Math.random().toString(36).slice(2,8).toUpperCase();
+    const houseName=houses.find(h=>h.id===house)?.name;
     return (
-      <div className="stage">
-        <div className="sheet"><SheetCorners/>
-          <div className="sheet-inner done-card">
-            <div className="done-seal">
-              <div className="done-seal-inner">Ballot<span className="big">Sealed</span>Verified</div>
-            </div>
-            <div className="sheet-title">
-              <div className="eyebrow">Receipt of Vote</div>
-              <h2>Thank you for voting.</h2>
-              <p className="desc">Your ballot has been recorded and sealed. The Returning Officer will publish results after polls close.</p>
-            </div>
-            <RuleOrn/>
-            <div className="receipt">
-              <div className="lbl">Voter</div><div>{name}</div>
-              <div className="lbl">Class</div><div>{klass}</div>
-              <div className="lbl">House</div><div>{houseName}</div>
-              <div className="lbl">Receipt No.</div><div>{receiptNo}</div>
-              <div className="lbl">Issued At</div><div>{new Date().toLocaleString("en-GB",{dateStyle:"short",timeStyle:"short"})}</div>
-            </div>
-            <div style={{marginTop:28}}>
-              <button className="btn" onClick={() => { setName(""); setKlass(""); setHouse(null); setPicks({}); setRoleIdx(0); setStep("welcome"); }}>Return to Welcome</button>
-            </div>
+      <div className="stage"><div className="sheet"><SheetCorners/>
+        <div className="sheet-inner done-card">
+          <div className="done-seal"><div className="done-seal-inner">Ballot<span className="big">Sealed</span>Verified</div></div>
+          <div className="sheet-title"><div className="eyebrow">Receipt of Vote</div><h2>Thank you for voting.</h2><p className="desc">Your ballot has been recorded and sealed. The Returning Officer will publish results after polls close.</p></div>
+          <RuleOrn/>
+          <div className="receipt">
+            <div className="lbl">Voter</div><div>{name}</div>
+            <div className="lbl">Class</div><div>{klass}</div>
+            <div className="lbl">House</div><div>{houseName}</div>
+            <div className="lbl">Receipt No.</div><div>{receiptNo}</div>
+            <div className="lbl">Issued At</div><div>{new Date().toLocaleString("en-GB",{dateStyle:"short",timeStyle:"short"})}</div>
           </div>
+          <div style={{marginTop:28}}><button className="btn" onClick={()=>{setName("");setKlass("");setHouse(null);setPicks({});setRoleIdx(0);setStep("welcome");}}>Return to Welcome</button></div>
         </div>
-      </div>
+      </div></div>
     );
   }
 
   return (
     <div className="stage">
+      {submitting&&<LoadingOverlay msg="Sealing ballot…"/>}
       <Stepper steps={stepperSteps} currentIndex={stepperIndex}/>
-      {step === "identity" && (
+      {step==="identity"&&(
         <div className="sheet"><SheetCorners/>
           <div className="sheet-inner">
-            <div className="sheet-title">
-              <div className="eyebrow">Form A \u2014 Voter Identification</div>
-              <h2>Identify yourself for the record.</h2>
-              <p className="desc">Your name and class will be sealed with your ballot. Use your full name as registered with the school.</p>
-            </div>
+            <div className="sheet-title"><div className="eyebrow">Form A — Voter Identification</div><h2>Identify yourself for the record.</h2><p className="desc">Your name and class will be sealed with your ballot. Use your full name as registered.</p></div>
             <RuleOrn/>
             <div className="row row-2">
-              <div className="field">
-                <label>Full Name</label>
-                <input className="input" placeholder="e.g. Aarav Sharma" value={name} onChange={e => setName(e.target.value)} autoFocus/>
-              </div>
-              <div className="field">
-                <label>Class &amp; Section</label>
-                <select className="input" value={klass} onChange={e => setKlass(e.target.value)}>
+              <div className="field"><label>Full Name</label><input className="input" placeholder="e.g. Aarav Sharma" value={name} onChange={e=>setName(e.target.value)} autoFocus/></div>
+              <div className="field"><label>Class & Section</label>
+                <select className="input" value={klass} onChange={e=>setKlass(e.target.value)}>
                   <option value="">Select your class</option>
-                  {CLASSES.map(c => <option key={c} value={c}>Class {c}</option>)}
+                  {classes.map(c=><option key={c} value={c}>Class {c}</option>)}
                 </select>
               </div>
             </div>
             <div style={{marginTop:22,paddingTop:18,borderTop:"1px dashed rgba(20,33,61,0.25)",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-              <button className="btn btn-ghost" onClick={() => setStep("welcome")}>\u2190 Cancel</button>
-              <button className="btn btn-primary" onClick={handleIdentityNext} disabled={!name.trim()||!klass}>Proceed to House Selection \u2192</button>
+              <button className="btn btn-ghost" onClick={()=>setStep("welcome")}>← Cancel</button>
+              <button className="btn btn-primary" onClick={handleIdentityNext} disabled={!name.trim()||!klass}>Proceed to House Selection →</button>
             </div>
           </div>
         </div>
       )}
-      {step === "house" && (
+      {step==="house"&&(
         <div className="sheet"><SheetCorners/>
           <div className="sheet-inner">
-            <div className="sheet-title">
-              <div className="eyebrow">Form B \u2014 House Affiliation</div>
-              <h2>Which house do you belong to?</h2>
-              <p className="desc">Your house affiliation determines which House Captain candidates will appear on your ballot.</p>
-            </div>
+            <div className="sheet-title"><div className="eyebrow">Form B — House Affiliation</div><h2>Which house do you belong to?</h2><p className="desc">Your house determines which House Captain candidates appear on your ballot.</p></div>
             <RuleOrn/>
             <div className="house-grid">
-              {HOUSES.map(h => (
-                <button key={h.id} className={"house-card"+(house===h.id?" selected":"")} onClick={() => setHouse(h.id)} style={{"--house-color":h.color}}>
+              {houses.map(h=>(
+                <button key={h.id} className={"house-card"+(house===h.id?" selected":"")} onClick={()=>setHouse(h.id)} style={{"--house-color":h.color}}>
                   <div className="house-swatch"/>
-                  <div><div className="house-name">{h.name}</div><div className="house-meta">{h.desc}</div></div>
+                  <div><div className="house-name">{h.name}</div><div className="house-meta">{h.description}</div></div>
                 </button>
               ))}
             </div>
             <div style={{marginTop:28,paddingTop:18,borderTop:"1px dashed rgba(20,33,61,0.25)",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-              <button className="btn btn-ghost" onClick={() => setStep("identity")}>\u2190 Back</button>
-              <button className="btn btn-primary" onClick={handleHouseNext} disabled={!house}>Begin Voting \u2192</button>
+              <button className="btn btn-ghost" onClick={()=>setStep("identity")}>← Back</button>
+              <button className="btn btn-primary" onClick={()=>{if(!house)return;goToVote(0);}} disabled={!house}>Begin Voting →</button>
             </div>
           </div>
         </div>
       )}
-      {step.startsWith("vote:") && currentRole && (() => {
-        const sheetTitle = currentRole.gender ? `${currentRole.label} \u2014 ${currentRole.gender}` : currentRole.label;
-        const formNo = String.fromCharCode(67 + roleIdx);
-        const scopeBadge = currentRole.scope === "house"
-          ? <Chip variant="stamp">House: {HOUSES.find(h=>h.id===house)?.name||"—"}</Chip>
-          : currentRole.scope === "class" ? <Chip variant="stamp">Class: {klass}</Chip>
-          : <Chip>School-wide</Chip>;
-        const picked = picks[currentRole.id];
-        const isLast = roleIdx === ROLES.length - 1;
+      {step.startsWith("vote:")&&currentRole&&(()=>{
+        const sheetTitle=currentRole.gender?`${currentRole.label} — ${currentRole.gender}`:currentRole.label;
+        const formNo=String.fromCharCode(67+roleIdx);
+        const scopeBadge=currentRole.scope==="house"?<Chip variant="stamp">House: {houses.find(h=>h.id===house)?.name||"—"}</Chip>:currentRole.scope==="class"?<Chip variant="stamp">Class: {klass}</Chip>:<Chip>School-wide</Chip>;
+        const picked=picks[currentRole.id]; const isLast=roleIdx===ROLES.length-1;
         return (
           <div className="sheet"><SheetCorners/>
             <div className="sheet-inner">
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",fontFamily:"var(--mono)",fontSize:10,textTransform:"uppercase",letterSpacing:"0.22em",color:"var(--ink-3)",marginBottom:14}}>
-                <span>Ballot {roleIdx+1} of {ROLES.length}</span>
-                {scopeBadge}
+                <span>Ballot {roleIdx+1} of {ROLES.length}</span>{scopeBadge}
               </div>
-              <div className="sheet-title">
-                <div className="eyebrow">Form {formNo} \u2014 Ballot Paper</div>
-                <h2>{sheetTitle}</h2>
-                <p className="desc">Select one candidate by tapping their card. Your selection is sealed when you proceed.</p>
-              </div>
+              <div className="sheet-title"><div className="eyebrow">Form {formNo} — Ballot Paper</div><h2>{sheetTitle}</h2><p className="desc">Select one candidate. Your selection is sealed when you proceed.</p></div>
               <RuleOrn/>
-              {candidatesForCurrent.length === 0 ? (
-                <div className="empty"><h4>No candidates listed.</h4><p>The Returning Officer has not registered any candidates for this role.</p></div>
-              ) : (
+              {candidatesForCurrent.length===0?(
+                <div className="empty"><h4>No candidates listed.</h4><p>The Returning Officer has not registered candidates for this role.</p></div>
+              ):(
                 <div className="ballot-grid">
-                  {candidatesForCurrent.map((c,i) => (
-                    <button key={c.id} className={"candidate-card"+(picked===c.id?" selected":"")} onClick={() => handlePick(c.id)}>
+                  {candidatesForCurrent.map((c,i)=>(
+                    <button key={c.id} className={"candidate-card"+(picked===c.id?" selected":"")} onClick={()=>setPicks(p=>({...p,[currentRole.id]:c.id}))}>
                       <div className="candidate-sl">{String(i+1).padStart(2,"0")}</div>
                       <div className="candidate-body">
                         <div className="candidate-name">{c.name}</div>
-                        <div className="candidate-meta">{currentRole.scope==="school"?"School Candidate":currentRole.scope==="house"?`${HOUSES.find(h=>h.id===house)?.name} House`:`Class ${klass}`}</div>
+                        <div className="candidate-meta">{currentRole.scope==="school"?"School Candidate":currentRole.scope==="house"?`${houses.find(h=>h.id===house)?.name} House`:`Class ${klass}`}</div>
                       </div>
                       <div className="candidate-symbol"><BallotSymbol name={c.symbol}/></div>
-                      {picked===c.id && <div className="tick-stamp"><div><div style={{fontSize:28,fontFamily:"var(--serif)",letterSpacing:0}}>\u2713</div><div style={{marginTop:4}}>Voted</div></div></div>}
+                      {picked===c.id&&<div className="tick-stamp"><div><div style={{fontSize:28,fontFamily:"var(--serif)",letterSpacing:0}}>✓</div><div style={{marginTop:4}}>Voted</div></div></div>}
                     </button>
                   ))}
                 </div>
               )}
               <div style={{marginTop:26,paddingTop:18,borderTop:"1px dashed rgba(20,33,61,0.25)",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                <button className="btn btn-ghost" onClick={handleVoteBack}>\u2190 Back</button>
-                <button className={"btn "+(isLast?"btn-stamp":"btn-primary")} onClick={handleVoteNext} disabled={!picked}>
-                  {isLast ? "Seal & Submit Ballot" : "Confirm & Next Ballot \u2192"}
-                </button>
+                <button className="btn btn-ghost" onClick={()=>{if(roleIdx===0)setStep("house");else goToVote(roleIdx-1);}}>← Back</button>
+                <button className={"btn "+(isLast?"btn-stamp":"btn-primary")} onClick={handleVoteNext} disabled={!picked}>{isLast?"Seal & Submit Ballot":"Confirm & Next Ballot →"}</button>
               </div>
             </div>
           </div>
@@ -884,34 +598,32 @@ const StudentApp = ({ candidates, votingOpen, onSubmitVote, hasVoted }) => {
   );
 };
 
-// ============================================================
-// ADMIN DASHBOARD
-// ============================================================
-const AdminApp = ({ candidates, setCandidates, votes, setVotes, houses, setHouses, classes, setClasses, votingOpen, setVotingOpen }) => {
-  const [tab, setTab] = useState("overview");
+// ─── Admin Dashboard ──────────────────────────────────────────────────────────
+const AdminApp = ({ candidates, setCandidates, votes, setVotes, houses, setHouses, classes, setClasses, votingOpen, setVotingOpen, reload }) => {
+  const [tab,setTab]=useState("overview");
   return (
     <div className="stage-wide">
       <div className="admin-shell">
         <aside className="admin-nav">
           <div className="admin-nav-section">Election Office</div>
-          <button className={tab==="overview"?"active":""} onClick={() => setTab("overview")}>Overview</button>
-          <button className={tab==="candidates"?"active":""} onClick={() => setTab("candidates")}>Candidates</button>
-          <button className={tab==="results"?"active":""} onClick={() => setTab("results")}>Live Results</button>
+          <button className={tab==="overview"?"active":""} onClick={()=>setTab("overview")}>Overview</button>
+          <button className={tab==="candidates"?"active":""} onClick={()=>setTab("candidates")}>Candidates</button>
+          <button className={tab==="results"?"active":""} onClick={()=>setTab("results")}>Live Results</button>
           <div className="admin-nav-section">Configuration</div>
-          <button className={tab==="houses"?"active":""} onClick={() => setTab("houses")}>Houses</button>
-          <button className={tab==="classes"?"active":""} onClick={() => setTab("classes")}>Classes</button>
-          <button className={tab==="settings"?"active":""} onClick={() => setTab("settings")}>Polling Window</button>
+          <button className={tab==="houses"?"active":""} onClick={()=>setTab("houses")}>Houses</button>
+          <button className={tab==="classes"?"active":""} onClick={()=>setTab("classes")}>Classes</button>
+          <button className={tab==="settings"?"active":""} onClick={()=>setTab("settings")}>Polling Window</button>
           <div className="admin-nav-section">Output</div>
-          <button className={tab==="export"?"active":""} onClick={() => setTab("export")}>Export Records</button>
+          <button className={tab==="export"?"active":""} onClick={()=>setTab("export")}>Export Records</button>
         </aside>
         <main className="admin-panel">
-          {tab==="overview" && <Overview candidates={candidates} votes={votes} houses={houses} votingOpen={votingOpen} onTab={setTab}/>}
-          {tab==="candidates" && <Candidates candidates={candidates} setCandidates={setCandidates} houses={houses} classes={classes}/>}
-          {tab==="results" && <Results candidates={candidates} votes={votes} houses={houses} classes={classes}/>}
-          {tab==="houses" && <HousesAdmin houses={houses} setHouses={setHouses} candidates={candidates}/>}
-          {tab==="classes" && <ClassesAdmin classes={classes} setClasses={setClasses} candidates={candidates}/>}
-          {tab==="settings" && <SettingsAdmin votingOpen={votingOpen} setVotingOpen={setVotingOpen} votes={votes} setVotes={setVotes} setCandidates={setCandidates}/>}
-          {tab==="export" && <ExportAdmin candidates={candidates} votes={votes} houses={houses}/>}
+          {tab==="overview"&&<Overview candidates={candidates} votes={votes} houses={houses} votingOpen={votingOpen} onTab={setTab}/>}
+          {tab==="candidates"&&<Candidates candidates={candidates} setCandidates={setCandidates} houses={houses} classes={classes}/>}
+          {tab==="results"&&<Results candidates={candidates} votes={votes} houses={houses} classes={classes}/>}
+          {tab==="houses"&&<HousesAdmin houses={houses} setHouses={setHouses} candidates={candidates} reload={reload}/>}
+          {tab==="classes"&&<ClassesAdmin classes={classes} setClasses={setClasses} candidates={candidates} reload={reload}/>}
+          {tab==="settings"&&<SettingsAdmin votingOpen={votingOpen} setVotingOpen={setVotingOpen} votes={votes} setVotes={setVotes} setCandidates={setCandidates} reload={reload}/>}
+          {tab==="export"&&<ExportAdmin candidates={candidates} votes={votes} houses={houses}/>}
         </main>
       </div>
     </div>
@@ -919,250 +631,161 @@ const AdminApp = ({ candidates, setCandidates, votes, setVotes, houses, setHouse
 };
 
 const Overview = ({ candidates, votes, houses, votingOpen, onTab }) => {
-  const totalVoters = votes.length;
-  const byHouse = useMemo(() => {
-    const m = {}; houses.forEach(h => m[h.id]=0); votes.forEach(v => { if (m[v.house]!=null) m[v.house]++; }); return m;
-  }, [votes, houses]);
-  const lastVotes = [...votes].slice(-6).reverse();
-  return (
-    <>
-      <div className="admin-h">
-        <div><h2>Returning Officer Console</h2><div className="desc">DPS Biratnagar \u00b7 Student Council Election 2026</div></div>
-        <Chip variant={votingOpen?"tick":"stamp"}>{votingOpen?"Polls Open":"Polls Closed"}</Chip>
-      </div>
-      <div className="stat-grid">
-        <div className="stat"><div className="label">Ballots Cast</div><div className="val">{totalVoters}</div><div className="sub">{votingOpen?"Counting in progress":"Polls closed"}</div></div>
-        <div className="stat"><div className="label">Candidates Listed</div><div className="val">{candidates.length}</div><div className="sub">{ROLES.length} roles</div></div>
-        <div className="stat"><div className="label">Houses</div><div className="val">{houses.length}</div><div className="sub">All affiliations</div></div>
-        <div className="stat">
-          <div className="label">Last Vote</div>
-          <div className="val" style={{fontSize:22}}>{votes.length ? new Date(votes[votes.length-1].ts).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}) : "—"}</div>
-          <div className="sub">{votes.length ? new Date(votes[votes.length-1].ts).toLocaleDateString("en-GB") : "No ballots yet"}</div>
+  const total=votes.length;
+  const byHouse=useMemo(()=>{const m={};houses.forEach(h=>m[h.id]=0);votes.forEach(v=>{if(m[v.house]!=null)m[v.house]++;});return m;},[votes,houses]);
+  const last=[...votes].slice(-6).reverse();
+  return (<>
+    <div className="admin-h"><div><h2>Returning Officer Console</h2><div className="desc">DPS Biratnagar · Student Council Election 2026</div></div><Chip variant={votingOpen?"tick":"stamp"}>{votingOpen?"Polls Open":"Polls Closed"}</Chip></div>
+    <div className="stat-grid">
+      <div className="stat"><div className="label">Ballots Cast</div><div className="val">{total}</div><div className="sub">{votingOpen?"Counting in progress":"Polls closed"}</div></div>
+      <div className="stat"><div className="label">Candidates</div><div className="val">{candidates.length}</div><div className="sub">{ROLES.length} roles</div></div>
+      <div className="stat"><div className="label">Houses</div><div className="val">{houses.length}</div><div className="sub">All affiliations</div></div>
+      <div className="stat"><div className="label">Last Vote</div><div className="val" style={{fontSize:22}}>{votes.length?new Date(votes[votes.length-1].ts).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}):"—"}</div><div className="sub">{votes.length?new Date(votes[votes.length-1].ts).toLocaleDateString("en-GB"):"No ballots yet"}</div></div>
+    </div>
+    <div style={{display:"grid",gridTemplateColumns:"1.4fr 1fr",gap:24}}>
+      <section>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:10}}>
+          <h3 style={{fontSize:22}}>Turnout by House</h3>
+          <button className="btn btn-ghost btn-sm" onClick={()=>onTab("results")}>Open Live Results →</button>
         </div>
-      </div>
-      <div style={{display:"grid",gridTemplateColumns:"1.4fr 1fr",gap:24}}>
-        <section>
-          <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:10}}>
-            <h3 style={{fontSize:22}}>Turnout by House</h3>
-            <button className="btn btn-ghost btn-sm" onClick={() => onTab("results")}>Open Live Results \u2192</button>
-          </div>
-          <div style={{border:"1.5px solid var(--rule)",padding:18,background:"var(--paper)"}}>
-            {houses.map(h => {
-              const n = byHouse[h.id]||0;
-              const pct = totalVoters ? Math.round(n/totalVoters*100) : 0;
-              return (
-                <div key={h.id} style={{padding:"10px 0",borderBottom:"1px dashed rgba(20,33,61,0.18)"}}>
-                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                    <div style={{display:"flex",alignItems:"center",gap:10}}>
-                      <span style={{width:14,height:14,borderRadius:"50%",background:h.color,border:"1.5px solid var(--ink)",display:"inline-block"}}/>
-                      <span style={{fontFamily:"var(--serif)",fontSize:18}}>{h.name}</span>
-                    </div>
-                    <div style={{fontFamily:"var(--mono)",fontSize:13}}>{n}{pct ? <span style={{color:"var(--ink-3)"}}> \u00b7 {pct}%</span> : null}</div>
-                  </div>
-                  <div className="bar-track"><div className="bar-fill" style={{width:pct+"%"}}/></div>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-        <section>
-          <h3 style={{fontSize:22,marginBottom:10}}>Recent Ballots</h3>
-          <div style={{border:"1.5px solid var(--rule)",background:"var(--paper)"}}>
-            {lastVotes.length===0 ? (
-              <div className="empty" style={{margin:0,border:"none"}}><p>No ballots cast yet.</p></div>
-            ) : lastVotes.map((v,i) => (
-              <div key={i} style={{padding:"12px 14px",borderBottom:i<lastVotes.length-1?"1px dashed rgba(20,33,61,0.18)":"none"}}>
-                <div style={{fontFamily:"var(--serif)",fontSize:17}}>{v.name}</div>
-                <div style={{fontFamily:"var(--mono)",fontSize:10,textTransform:"uppercase",letterSpacing:"0.14em",color:"var(--ink-3)",marginTop:2}}>
-                  Class {v.klass} \u00b7 {houses.find(h=>h.id===v.house)?.name} \u00b7 {new Date(v.ts).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"})}
-                </div>
+        <div style={{border:"1.5px solid var(--rule)",padding:18,background:"var(--paper)"}}>
+          {houses.map(h=>{const n=byHouse[h.id]||0;const pct=total?Math.round(n/total*100):0;return(
+            <div key={h.id} style={{padding:"10px 0",borderBottom:"1px dashed rgba(20,33,61,0.18)"}}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                <div style={{display:"flex",alignItems:"center",gap:10}}><span style={{width:14,height:14,borderRadius:"50%",background:h.color,border:"1.5px solid var(--ink)",display:"inline-block"}}/><span style={{fontFamily:"var(--serif)",fontSize:18}}>{h.name}</span></div>
+                <div style={{fontFamily:"var(--mono)",fontSize:13}}>{n}{pct?<span style={{color:"var(--ink-3)"}}> · {pct}%</span>:null}</div>
               </div>
-            ))}
-          </div>
-        </section>
-      </div>
-    </>
-  );
+              <div className="bar-track"><div className="bar-fill" style={{width:pct+"%"}}/></div>
+            </div>
+          );})}
+        </div>
+      </section>
+      <section>
+        <h3 style={{fontSize:22,marginBottom:10}}>Recent Ballots</h3>
+        <div style={{border:"1.5px solid var(--rule)",background:"var(--paper)"}}>
+          {last.length===0?<div className="empty" style={{margin:0,border:"none"}}><p>No ballots cast yet.</p></div>:last.map((v,i)=>(
+            <div key={i} style={{padding:"12px 14px",borderBottom:i<last.length-1?"1px dashed rgba(20,33,61,0.18)":"none"}}>
+              <div style={{fontFamily:"var(--serif)",fontSize:17}}>{v.voter_name}</div>
+              <div style={{fontFamily:"var(--mono)",fontSize:10,textTransform:"uppercase",letterSpacing:"0.14em",color:"var(--ink-3)",marginTop:2}}>
+                Class {v.class} · {houses.find(h=>h.id===v.house)?.name} · {new Date(v.ts).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"})}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
+  </>);
 };
 
 const Candidates = ({ candidates, setCandidates, houses, classes }) => {
-  const [filterRole, setFilterRole] = useState("all");
-  const [filterHouse, setFilterHouse] = useState("all");
-  const [editing, setEditing] = useState(null);
-  const filtered = candidates.filter(c => {
-    if (filterRole !== "all" && c.role !== filterRole) return false;
-    if (filterHouse !== "all" && c.house !== filterHouse) return false;
-    return true;
-  });
-  const handleSave = (cand) => {
-    setCandidates(prev => {
-      const ex = prev.find(p => p.id === cand.id);
-      if (ex) return prev.map(p => p.id===cand.id ? cand : p);
-      return [...prev, {...cand, id:"c"+Date.now()}];
-    });
-    setEditing(null);
+  const [filterRole,setFilterRole]=useState("all"); const [filterHouse,setFilterHouse]=useState("all"); const [editing,setEditing]=useState(null); const [saving,setSaving]=useState(false);
+  const filtered=candidates.filter(c=>(filterRole==="all"||c.role===filterRole)&&(filterHouse==="all"||c.house===filterHouse));
+  const handleSave=async(cand)=>{
+    setSaving(true);
+    const row={name:cand.name,role:cand.role,gender:cand.gender||null,house:cand.house||null,class:cand.class||null,symbol:cand.symbol,photo:cand.photo||null};
+    if(cand.id){
+      await sb.from("candidates").update(row).eq("id",cand.id);
+      setCandidates(prev=>prev.map(p=>p.id===cand.id?{...p,...row}:p));
+    } else {
+      const id="c"+Date.now();
+      await sb.from("candidates").insert({id,...row});
+      setCandidates(prev=>[...prev,{id,...row}]);
+    }
+    setSaving(false); setEditing(null);
   };
-  const handleDelete = (id) => { if (!confirm("Delete this candidate?")) return; setCandidates(prev => prev.filter(p => p.id!==id)); };
-  return (
-    <>
-      <div className="admin-h">
-        <div><h2>Candidate Register</h2><div className="desc">Add, edit, or strike off candidates.</div></div>
-        <button className="btn btn-primary" onClick={() => setEditing({})}>+ Add Candidate</button>
-      </div>
-      <div style={{display:"flex",gap:12,marginBottom:16,flexWrap:"wrap"}}>
-        <div className="field">
-          <label>Role</label>
-          <select className="input" value={filterRole} onChange={e => setFilterRole(e.target.value)}>
-            <option value="all">All Roles</option>
-            {ROLES.map(r => <option key={r.id} value={r.id}>{r.label}{r.gender?` (${r.gender})`:""}</option>)}
-          </select>
-        </div>
-        <div className="field">
-          <label>House</label>
-          <select className="input" value={filterHouse} onChange={e => setFilterHouse(e.target.value)}>
-            <option value="all">All Houses</option>
-            {houses.map(h => <option key={h.id} value={h.id}>{h.name}</option>)}
-          </select>
-        </div>
-      </div>
-      {filtered.length === 0 ? (
-        <div className="empty"><h4>No candidates match those filters.</h4><p>Adjust the filters or add a new candidate.</p><button className="btn btn-primary" onClick={() => setEditing({})}>+ Add Candidate</button></div>
-      ) : (
-        <table className="table">
-          <thead><tr><th style={{width:60}}>Symbol</th><th>Name</th><th>Role</th><th>House</th><th>Class</th><th style={{width:130}}>Actions</th></tr></thead>
-          <tbody>
-            {filtered.map(c => {
-              const r = ROLES.find(r => r.id===c.role);
-              return (
-                <tr key={c.id}>
-                  <td><div style={{width:38,height:38,border:"1.5px solid var(--rule)",display:"grid",placeItems:"center",background:"var(--paper-3)",borderRadius:2}}><BallotSymbol name={c.symbol}/></div></td>
-                  <td style={{fontFamily:"var(--serif)",fontSize:18}}>{c.name}</td>
-                  <td><Chip>{r?.label}{r?.gender?` \u00b7 ${r.gender}`:""}</Chip></td>
-                  <td>{c.house ? houses.find(h=>h.id===c.house)?.name : "—"}</td>
-                  <td style={{fontFamily:"var(--mono)",fontSize:13}}>{c.klass||"—"}</td>
-                  <td><div style={{display:"flex",gap:6}}><button className="btn btn-sm" onClick={() => setEditing(c)}>Edit</button><button className="btn btn-sm" onClick={() => handleDelete(c.id)} style={{borderColor:"var(--stamp)",color:"var(--stamp)"}}>Strike</button></div></td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      )}
-      {editing && <CandidateModal initial={editing} houses={houses} classes={classes} onClose={() => setEditing(null)} onSave={handleSave}/>}
-    </>
-  );
+  const handleDelete=async(id)=>{
+    if(!confirm("Delete this candidate?")) return;
+    await sb.from("candidates").delete().eq("id",id);
+    setCandidates(prev=>prev.filter(p=>p.id!==id));
+  };
+  return (<>
+    {saving&&<LoadingOverlay msg="Saving…"/>}
+    <div className="admin-h"><div><h2>Candidate Register</h2><div className="desc">Add, edit, or strike off candidates.</div></div><button className="btn btn-primary" onClick={()=>setEditing({})}>+ Add Candidate</button></div>
+    <div style={{display:"flex",gap:12,marginBottom:16,flexWrap:"wrap"}}>
+      <div className="field"><label>Role</label><select className="input" value={filterRole} onChange={e=>setFilterRole(e.target.value)}><option value="all">All Roles</option>{ROLES.map(r=><option key={r.id} value={r.id}>{r.label}{r.gender?` (${r.gender})`:""}</option>)}</select></div>
+      <div className="field"><label>House</label><select className="input" value={filterHouse} onChange={e=>setFilterHouse(e.target.value)}><option value="all">All Houses</option>{houses.map(h=><option key={h.id} value={h.id}>{h.name}</option>)}</select></div>
+    </div>
+    {filtered.length===0?(<div className="empty"><h4>No candidates match.</h4><p>Adjust filters or add a candidate.</p><button className="btn btn-primary" onClick={()=>setEditing({})}>+ Add Candidate</button></div>):(
+      <table className="table">
+        <thead><tr><th style={{width:60}}>Symbol</th><th>Name</th><th>Role</th><th>House</th><th>Class</th><th style={{width:130}}>Actions</th></tr></thead>
+        <tbody>{filtered.map(c=>{const r=ROLES.find(r=>r.id===c.role);return(
+          <tr key={c.id}>
+            <td><div style={{width:38,height:38,border:"1.5px solid var(--rule)",display:"grid",placeItems:"center",background:"var(--paper-3)",borderRadius:2}}><BallotSymbol name={c.symbol}/></div></td>
+            <td style={{fontFamily:"var(--serif)",fontSize:18}}>{c.name}</td>
+            <td><Chip>{r?.label}{r?.gender?` · ${r.gender}`:""}</Chip></td>
+            <td>{c.house?houses.find(h=>h.id===c.house)?.name:"—"}</td>
+            <td style={{fontFamily:"var(--mono)",fontSize:13}}>{c.class||"—"}</td>
+            <td><div style={{display:"flex",gap:6}}><button className="btn btn-sm" onClick={()=>setEditing(c)}>Edit</button><button className="btn btn-sm" onClick={()=>handleDelete(c.id)} style={{borderColor:"var(--stamp)",color:"var(--stamp)"}}>Strike</button></div></td>
+          </tr>
+        );})}</tbody>
+      </table>
+    )}
+    {editing&&<CandidateModal initial={editing} houses={houses} classes={classes} onClose={()=>setEditing(null)} onSave={handleSave}/>}
+  </>);
 };
 
 const CandidateModal = ({ initial, houses, classes, onClose, onSave }) => {
-  const [form, setForm] = useState({ id:initial.id, name:initial.name||"", role:initial.role||"sc_b", gender:initial.gender||"Boy", house:initial.house||"", klass:initial.klass||"", symbol:initial.symbol||"star", photo:initial.photo||null });
-  const role = ROLES.find(r => r.id===form.role);
-  const needsHouse = role?.scope==="house", needsClass = role?.scope==="class", needsGender = !!role?.gender;
-  useEffect(() => {
-    if (needsGender && form.gender !== role.gender) setForm(f => ({...f, gender:role.gender}));
-    if (!needsGender && form.gender) setForm(f => ({...f, gender:null}));
-    if (!needsHouse && form.house) setForm(f => ({...f, house:""}));
-    if (!needsClass && form.klass) setForm(f => ({...f, klass:""}));
-  }, [form.role]);
-  const handlePhoto = (e) => { const file = e.target.files?.[0]; if (!file) return; const reader = new FileReader(); reader.onload = () => setForm(f => ({...f,photo:reader.result})); reader.readAsDataURL(file); };
-  const canSave = form.name.trim() && (!needsHouse||form.house) && (!needsClass||form.klass);
+  const [form,setForm]=useState({id:initial.id,name:initial.name||"",role:initial.role||"sc_b",gender:initial.gender||"Boy",house:initial.house||"",class:initial.class||"",symbol:initial.symbol||"star",photo:initial.photo||null});
+  const role=ROLES.find(r=>r.id===form.role);
+  const needsHouse=role?.scope==="house",needsClass=role?.scope==="class",needsGender=!!role?.gender;
+  useEffect(()=>{
+    if(needsGender&&form.gender!==role.gender) setForm(f=>({...f,gender:role.gender}));
+    if(!needsGender&&form.gender) setForm(f=>({...f,gender:null}));
+    if(!needsHouse&&form.house) setForm(f=>({...f,house:""}));
+    if(!needsClass&&form.class) setForm(f=>({...f,class:""}));
+  },[form.role]);
+  const handlePhoto=e=>{const file=e.target.files?.[0];if(!file)return;const reader=new FileReader();reader.onload=()=>setForm(f=>({...f,photo:reader.result}));reader.readAsDataURL(file);};
+  const canSave=form.name.trim()&&(!needsHouse||form.house)&&(!needsClass||form.class);
   return (
-    <Modal title={initial.id?"Edit Candidate":"Register New Candidate"} onClose={onClose} footer={(<><button className="btn btn-ghost" onClick={onClose}>Cancel</button><button className="btn btn-primary" disabled={!canSave} onClick={() => onSave(form)}>{initial.id?"Save Changes":"Register Candidate"}</button></>)}>
+    <Modal title={initial.id?"Edit Candidate":"Register New Candidate"} onClose={onClose} footer={(<><button className="btn btn-ghost" onClick={onClose}>Cancel</button><button className="btn btn-primary" disabled={!canSave} onClick={()=>onSave(form)}>{initial.id?"Save Changes":"Register Candidate"}</button></>)}>
       <div style={{display:"grid",gridTemplateColumns:"150px 1fr",gap:22}}>
-        <div>
-          <div className="field">
-            <label>Photo (optional)</label>
-            <label className="image-slot" htmlFor="photo-input">
-              {form.photo ? <img src={form.photo} alt=""/> : <span>Tap to upload<br/>candidate photo</span>}
-            </label>
-            <input id="photo-input" type="file" accept="image/*" onChange={handlePhoto} style={{display:"none"}}/>
-          </div>
-        </div>
+        <div><div className="field"><label>Photo (optional)</label><label className="image-slot" htmlFor="photo-input">{form.photo?<img src={form.photo} alt=""/>:<span>Tap to upload<br/>candidate photo</span>}</label><input id="photo-input" type="file" accept="image/*" onChange={handlePhoto} style={{display:"none"}}/></div></div>
         <div style={{display:"grid",gap:14}}>
-          <div className="field"><label>Full Name</label><input className="input" value={form.name} onChange={e => setForm(f => ({...f,name:e.target.value}))}/></div>
+          <div className="field"><label>Full Name</label><input className="input" value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))}/></div>
           <div className="row row-2">
-            <div className="field">
-              <label>Role</label>
-              <select className="input" value={form.role} onChange={e => setForm(f => ({...f,role:e.target.value}))}>
-                {ROLES.map(r => <option key={r.id} value={r.id}>{r.label}{r.gender?` (${r.gender})`:""}</option>)}
-              </select>
-            </div>
-            <div className="field">
-              <label>{needsHouse?"House":needsClass?"Class":"Scope"}</label>
-              {needsHouse ? (
-                <select className="input" value={form.house} onChange={e => setForm(f => ({...f,house:e.target.value}))}>
-                  <option value="">Select House</option>
-                  {houses.map(h => <option key={h.id} value={h.id}>{h.name}</option>)}
-                </select>
-              ) : needsClass ? (
-                <select className="input" value={form.klass} onChange={e => setForm(f => ({...f,klass:e.target.value}))}>
-                  <option value="">Select Class</option>
-                  {classes.map(c => <option key={c} value={c}>Class {c}</option>)}
-                </select>
-              ) : <input className="input" value="School-wide" disabled/>}
+            <div className="field"><label>Role</label><select className="input" value={form.role} onChange={e=>setForm(f=>({...f,role:e.target.value}))}>{ROLES.map(r=><option key={r.id} value={r.id}>{r.label}{r.gender?` (${r.gender})`:""}</option>)}</select></div>
+            <div className="field"><label>{needsHouse?"House":needsClass?"Class":"Scope"}</label>
+              {needsHouse?(<select className="input" value={form.house} onChange={e=>setForm(f=>({...f,house:e.target.value}))}><option value="">Select House</option>{houses.map(h=><option key={h.id} value={h.id}>{h.name}</option>)}</select>)
+              :needsClass?(<select className="input" value={form.class} onChange={e=>setForm(f=>({...f,class:e.target.value}))}><option value="">Select Class</option>{classes.map(c=><option key={c} value={c}>Class {c}</option>)}</select>)
+              :(<input className="input" value="School-wide" disabled/>)}
             </div>
           </div>
         </div>
       </div>
       <div className="field" style={{marginTop:22}}>
         <label>Election Symbol</label>
-        <div className="symbol-picker">
-          {SYMBOL_KEYS.map(k => (
-            <button key={k} type="button" className={"symbol-opt"+(form.symbol===k?" selected":"")} onClick={() => setForm(f => ({...f,symbol:k}))} title={k}>
-              <BallotSymbol name={k}/>
-            </button>
-          ))}
-        </div>
-        <div style={{fontFamily:"var(--mono)",fontSize:10,textTransform:"uppercase",letterSpacing:"0.14em",color:"var(--ink-3)",marginTop:8}}>Tip: The symbol appears on the ballot card.</div>
+        <div className="symbol-picker">{SYMBOL_KEYS.map(k=>(<button key={k} type="button" className={"symbol-opt"+(form.symbol===k?" selected":"")} onClick={()=>setForm(f=>({...f,symbol:k}))} title={k}><BallotSymbol name={k}/></button>))}</div>
       </div>
     </Modal>
   );
 };
 
 const Results = ({ candidates, votes, houses, classes }) => {
-  const [roleId, setRoleId] = useState(ROLES[0].id);
-  const [scope, setScope] = useState("all");
-  const role = ROLES.find(r => r.id===roleId);
-  const eligible = useMemo(() => candidates.filter(c => {
-    if (c.role !== roleId) return false;
-    if (role.scope==="house" && scope!=="all" && c.house!==scope) return false;
-    if (role.scope==="class" && scope!=="all" && c.klass!==scope) return false;
-    return true;
-  }), [candidates, roleId, scope, role]);
-  const tally = useMemo(() => {
-    const t = {}; eligible.forEach(c => t[c.id]=0);
-    votes.forEach(v => { const cid = v.picks[roleId]; if (cid!=null && t[cid]!=null) t[cid]++; }); return t;
-  }, [votes, eligible, roleId]);
-  const ranked = useMemo(() => [...eligible].sort((a,b) => (tally[b.id]||0)-(tally[a.id]||0)), [eligible, tally]);
-  const totalVotes = Object.values(tally).reduce((s,n) => s+n, 0);
-  const leadId = ranked[0]?.id;
-  return (
-    <>
-      <div className="admin-h">
-        <div><h2>Live Results</h2><div className="desc">{totalVotes} votes counted for this role</div></div>
-        <Chip variant="tick">Live</Chip>
-      </div>
-      <div style={{display:"flex",gap:12,marginBottom:18,flexWrap:"wrap"}}>
-        <div className="field">
-          <label>Role</label>
-          <select className="input" value={roleId} onChange={e => { setRoleId(e.target.value); setScope("all"); }}>
-            {ROLES.map(r => <option key={r.id} value={r.id}>{r.label}{r.gender?` (${r.gender})`:""}</option>)}
-          </select>
-        </div>
-        {role.scope==="house" && <div className="field"><label>House</label><select className="input" value={scope} onChange={e => setScope(e.target.value)}><option value="all">All Houses</option>{houses.map(h => <option key={h.id} value={h.id}>{h.name}</option>)}</select></div>}
-        {role.scope==="class" && <div className="field"><label>Class</label><select className="input" value={scope} onChange={e => setScope(e.target.value)}><option value="all">All Classes</option>{classes.map(c => <option key={c} value={c}>Class {c}</option>)}</select></div>}
-      </div>
-      {role.scope!=="school" && scope==="all" ? (
-        <div>{(role.scope==="house" ? houses.map(h => ({id:h.id,label:h.name})) : classes.map(c => ({id:c,label:"Class "+c}))).map(group => {
-          const gc = candidates.filter(c => c.role===roleId && (role.scope==="house"?c.house===group.id:c.klass===group.id));
-          const gt = {}; gc.forEach(c => gt[c.id]=0); votes.forEach(v => { const cid=v.picks[roleId]; if (cid!=null&&gt[cid]!=null) gt[cid]++; });
-          const gr = [...gc].sort((a,b) => (gt[b.id]||0)-(gt[a.id]||0));
-          const gTotal = Object.values(gt).reduce((s,n) => s+n,0);
-          return <ResultsGroup key={group.id} title={group.label} ranked={gr} tally={gt} leadId={gTotal?gr[0]?.id:null} total={gTotal}/>;
-        })}</div>
-      ) : (
-        <ResultsGroup title={role.label+(role.gender?` (${role.gender})`:"")} ranked={ranked} tally={tally} leadId={totalVotes?leadId:null} total={totalVotes}/>
-      )}
-    </>
-  );
+  const [roleId,setRoleId]=useState(ROLES[0].id); const [scope,setScope]=useState("all");
+  const role=ROLES.find(r=>r.id===roleId);
+  const eligible=useMemo(()=>candidates.filter(c=>{if(c.role!==roleId)return false;if(role.scope==="house"&&scope!=="all"&&c.house!==scope)return false;if(role.scope==="class"&&scope!=="all"&&c.class!==scope)return false;return true;}),[candidates,roleId,scope,role]);
+  const tally=useMemo(()=>{const t={};eligible.forEach(c=>t[c.id]=0);votes.forEach(v=>{const cid=v.picks[roleId];if(cid!=null&&t[cid]!=null)t[cid]++;});return t;},[votes,eligible,roleId]);
+  const ranked=useMemo(()=>[...eligible].sort((a,b)=>(tally[b.id]||0)-(tally[a.id]||0)),[eligible,tally]);
+  const totalVotes=Object.values(tally).reduce((s,n)=>s+n,0);
+  return (<>
+    <div className="admin-h"><div><h2>Live Results</h2><div className="desc">{totalVotes} votes counted</div></div><Chip variant="tick">Live</Chip></div>
+    <div style={{display:"flex",gap:12,marginBottom:18,flexWrap:"wrap"}}>
+      <div className="field"><label>Role</label><select className="input" value={roleId} onChange={e=>{setRoleId(e.target.value);setScope("all");}}>{ROLES.map(r=><option key={r.id} value={r.id}>{r.label}{r.gender?` (${r.gender})`:""}</option>)}</select></div>
+      {role.scope==="house"&&<div className="field"><label>House</label><select className="input" value={scope} onChange={e=>setScope(e.target.value)}><option value="all">All Houses</option>{houses.map(h=><option key={h.id} value={h.id}>{h.name}</option>)}</select></div>}
+      {role.scope==="class"&&<div className="field"><label>Class</label><select className="input" value={scope} onChange={e=>setScope(e.target.value)}><option value="all">All Classes</option>{classes.map(c=><option key={c} value={c}>Class {c}</option>)}</select></div>}
+    </div>
+    {role.scope!=="school"&&scope==="all"?(
+      <div>{(role.scope==="house"?houses.map(h=>({id:h.id,label:h.name})):classes.map(c=>({id:c,label:"Class "+c}))).map(g=>{
+        const gc=candidates.filter(c=>c.role===roleId&&(role.scope==="house"?c.house===g.id:c.class===g.id));
+        const gt={};gc.forEach(c=>gt[c.id]=0);votes.forEach(v=>{const cid=v.picks[roleId];if(cid!=null&&gt[cid]!=null)gt[cid]++;});
+        const gr=[...gc].sort((a,b)=>(gt[b.id]||0)-(gt[a.id]||0));
+        const gT=Object.values(gt).reduce((s,n)=>s+n,0);
+        return <ResultsGroup key={g.id} title={g.label} ranked={gr} tally={gt} leadId={gT?gr[0]?.id:null} total={gT}/>;
+      })}</div>
+    ):(
+      <ResultsGroup title={role.label+(role.gender?` (${role.gender})`:"")} ranked={ranked} tally={tally} leadId={totalVotes?ranked[0]?.id:null} total={totalVotes}/>
+    )}
+  </>);
 };
 
 const ResultsGroup = ({ title, ranked, tally, leadId, total }) => (
@@ -1171,220 +794,253 @@ const ResultsGroup = ({ title, ranked, tally, leadId, total }) => (
       <h3 style={{fontSize:22}}>{title}</h3>
       <div style={{fontFamily:"var(--mono)",fontSize:11,textTransform:"uppercase",letterSpacing:"0.14em",color:"var(--ink-3)"}}>{total} ballots</div>
     </div>
-    {ranked.length===0 ? <div className="empty" style={{margin:"8px 0 0"}}><p>No candidates assigned.</p></div> : ranked.map((c,i) => {
-      const n = tally[c.id]||0, pct = total ? (n/total*100) : 0, isLead = c.id===leadId && n>0;
-      return (
-        <div key={c.id} className="bar-row">
-          <div className="bar-sl">{String(i+1).padStart(2,"0")}</div>
-          <div className="bar-symbol"><BallotSymbol name={c.symbol}/></div>
-          <div className="bar-name">
-            <div className="nm">{c.name} {isLead && <span style={{color:"var(--stamp)",fontFamily:"var(--mono)",fontSize:10,letterSpacing:"0.14em",marginLeft:6}}>\u2605 LEAD</span>}</div>
-            <div className="bar-track"><div className={"bar-fill"+(isLead?" lead":"")} style={{width:pct+"%"}}/></div>
-          </div>
-          <div className="bar-count">{n}<span style={{color:"var(--ink-3)"}}> \u00b7 {Math.round(pct)}%</span></div>
-        </div>
-      );
+    {ranked.length===0?<div className="empty" style={{margin:"8px 0 0"}}><p>No candidates assigned.</p></div>:ranked.map((c,i)=>{
+      const n=tally[c.id]||0,pct=total?(n/total*100):0,isLead=c.id===leadId&&n>0;
+      return(<div key={c.id} className="bar-row">
+        <div className="bar-sl">{String(i+1).padStart(2,"0")}</div>
+        <div className="bar-symbol"><BallotSymbol name={c.symbol}/></div>
+        <div className="bar-name"><div className="nm">{c.name}{isLead&&<span style={{color:"var(--stamp)",fontFamily:"var(--mono)",fontSize:10,letterSpacing:"0.14em",marginLeft:6}}>★ LEAD</span>}</div><div className="bar-track"><div className={"bar-fill"+(isLead?" lead":"")} style={{width:pct+"%"}}/></div></div>
+        <div className="bar-count">{n}<span style={{color:"var(--ink-3)"}}> · {Math.round(pct)}%</span></div>
+      </div>);
     })}
   </div>
 );
 
-const HousesAdmin = ({ houses, setHouses, candidates }) => {
-  const [editing, setEditing] = useState(null);
-  const handleSave = (h) => { setHouses(prev => { const ex=prev.find(p=>p.id===h.id); if (ex) return prev.map(p=>p.id===h.id?h:p); return [...prev,{...h,id:h.id||h.name.toLowerCase().replace(/\s+/g,"-")}]; }); setEditing(null); };
-  const handleDelete = (id) => { const inUse=candidates.some(c=>c.house===id); if (inUse&&!confirm("Candidates assigned. Delete anyway?")) return; if (!inUse&&!confirm("Delete house?")) return; setHouses(prev=>prev.filter(h=>h.id!==id)); };
-  return (
-    <>
-      <div className="admin-h"><div><h2>Houses</h2><div className="desc">Four pillars of the school</div></div><button className="btn btn-primary" onClick={() => setEditing({})}>+ Add House</button></div>
-      <table className="table">
-        <thead><tr><th style={{width:60}}>Color</th><th>Name</th><th>Description</th><th>Candidates</th><th style={{width:130}}>Actions</th></tr></thead>
-        <tbody>{houses.map(h => { const count=candidates.filter(c=>c.house===h.id).length; return (
-          <tr key={h.id}>
-            <td><span style={{display:"inline-block",width:28,height:28,borderRadius:"50%",background:h.color,border:"1.5px solid var(--ink)"}}/></td>
-            <td style={{fontFamily:"var(--serif)",fontSize:20}}>{h.name}</td>
-            <td style={{fontFamily:"var(--mono)",fontSize:11,color:"var(--ink-3)"}}>{h.desc}</td>
-            <td><Chip>{count} candidates</Chip></td>
-            <td><div style={{display:"flex",gap:6}}><button className="btn btn-sm" onClick={() => setEditing(h)}>Edit</button><button className="btn btn-sm" onClick={() => handleDelete(h.id)} style={{borderColor:"var(--stamp)",color:"var(--stamp)"}}>Remove</button></div></td>
-          </tr>
-        );})}</tbody>
-      </table>
-      {editing && <Modal title={editing.id?"Edit House":"Add House"} onClose={() => setEditing(null)} footer={(<><button className="btn btn-ghost" onClick={() => setEditing(null)}>Cancel</button><button className="btn btn-primary" disabled={!editing.name?.trim()} onClick={() => handleSave(editing)}>Save</button></>)}>
-        <HouseForm form={editing} setForm={setEditing}/>
-      </Modal>}
-    </>
-  );
+const HousesAdmin = ({ houses, setHouses, candidates, reload }) => {
+  const [editing,setEditing]=useState(null); const [saving,setSaving]=useState(false);
+  const handleSave=async(h)=>{
+    setSaving(true);
+    const row={name:h.name,color:h.color,description:h.desc||h.description||""};
+    if(h.id&&houses.find(x=>x.id===h.id)){await sb.from("houses").update(row).eq("id",h.id);setHouses(prev=>prev.map(x=>x.id===h.id?{...x,...row}:x));}
+    else{const id=(h.name||"house").toLowerCase().replace(/\s+/g,"-")+"-"+Date.now();await sb.from("houses").insert({id,...row});setHouses(prev=>[...prev,{id,...row}]);}
+    setSaving(false);setEditing(null);
+  };
+  const handleDelete=async(id)=>{
+    const inUse=candidates.some(c=>c.house===id);
+    if(inUse&&!confirm("Candidates assigned. Delete anyway?")) return;
+    if(!inUse&&!confirm("Delete this house?")) return;
+    await sb.from("houses").delete().eq("id",id); setHouses(prev=>prev.filter(h=>h.id!==id));
+  };
+  return (<>
+    {saving&&<LoadingOverlay msg="Saving…"/>}
+    <div className="admin-h"><div><h2>Houses</h2><div className="desc">Four pillars of the school</div></div><button className="btn btn-primary" onClick={()=>setEditing({})}>+ Add House</button></div>
+    <table className="table">
+      <thead><tr><th style={{width:60}}>Color</th><th>Name</th><th>Description</th><th>Candidates</th><th style={{width:130}}>Actions</th></tr></thead>
+      <tbody>{houses.map(h=>{const count=candidates.filter(c=>c.house===h.id).length;return(
+        <tr key={h.id}>
+          <td><span style={{display:"inline-block",width:28,height:28,borderRadius:"50%",background:h.color,border:"1.5px solid var(--ink)"}}/></td>
+          <td style={{fontFamily:"var(--serif)",fontSize:20}}>{h.name}</td>
+          <td style={{fontFamily:"var(--mono)",fontSize:11,color:"var(--ink-3)"}}>{h.description}</td>
+          <td><Chip>{count} candidates</Chip></td>
+          <td><div style={{display:"flex",gap:6}}><button className="btn btn-sm" onClick={()=>setEditing(h)}>Edit</button><button className="btn btn-sm" onClick={()=>handleDelete(h.id)} style={{borderColor:"var(--stamp)",color:"var(--stamp)"}}>Remove</button></div></td>
+        </tr>
+      );})}</tbody>
+    </table>
+    {editing&&<Modal title={editing.id?"Edit House":"Add House"} onClose={()=>setEditing(null)} footer={(<><button className="btn btn-ghost" onClick={()=>setEditing(null)}>Cancel</button><button className="btn btn-primary" disabled={!editing.name?.trim()} onClick={()=>handleSave(editing)}>Save</button></>)}>
+      <div className="row row-2"><div className="field"><label>House Name</label><input className="input" value={editing.name||""} onChange={e=>setEditing(f=>({...f,name:e.target.value}))}/></div><div className="field"><label>Color</label><input className="input" type="color" value={editing.color||"#8b1f2f"} onChange={e=>setEditing(f=>({...f,color:e.target.value}))}/></div></div>
+      <div className="field" style={{marginTop:14}}><label>Description</label><input className="input" value={editing.description||editing.desc||""} onChange={e=>setEditing(f=>({...f,description:e.target.value}))}/></div>
+    </Modal>}
+  </>);
 };
 
-const HouseForm = ({ form, setForm }) => (
-  <>
-    <div className="row row-2">
-      <div className="field"><label>House Name</label><input className="input" value={form.name||""} onChange={e => setForm(f => ({...f,name:e.target.value}))}/></div>
-      <div className="field"><label>House Color</label><input className="input" type="color" value={form.color||"#8b1f2f"} onChange={e => setForm(f => ({...f,color:e.target.value}))}/></div>
+const ClassesAdmin = ({ classes, setClasses, candidates, reload }) => {
+  const [newClass,setNewClass]=useState(""); const [saving,setSaving]=useState(false);
+  const handleAdd=async()=>{const v=newClass.trim();if(!v||classes.includes(v))return;setSaving(true);await sb.from("classes").insert({id:v});setClasses(prev=>[...prev,v]);setSaving(false);setNewClass("");};
+  const handleRemove=async(c)=>{const inUse=candidates.some(x=>x.class===c);if(inUse&&!confirm("Candidates assigned. Remove?"))return;if(!inUse&&!confirm("Remove class?"))return;await sb.from("classes").delete().eq("id",c);setClasses(prev=>prev.filter(x=>x!==c));};
+  return (<>
+    {saving&&<LoadingOverlay msg="Saving…"/>}
+    <div className="admin-h"><div><h2>Classes</h2><div className="desc">Class & section roster for prefect ballots</div></div></div>
+    <div style={{display:"flex",gap:10,marginBottom:20}}>
+      <input className="input" placeholder="e.g. 11-A" value={newClass} onChange={e=>setNewClass(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleAdd()} style={{maxWidth:200}}/>
+      <button className="btn btn-primary" onClick={handleAdd}>+ Add Class</button>
     </div>
-    <div className="field" style={{marginTop:14}}><label>Description</label><input className="input" placeholder="e.g. Red · Heart of Scorpius" value={form.desc||""} onChange={e => setForm(f => ({...f,desc:e.target.value}))}/></div>
-  </>
-);
-
-const ClassesAdmin = ({ classes, setClasses, candidates }) => {
-  const [newClass, setNewClass] = useState("");
-  const handleAdd = () => { const v=newClass.trim(); if (!v||classes.includes(v)) return; setClasses(prev => [...prev,v]); setNewClass(""); };
-  const handleRemove = (c) => { const inUse=candidates.some(x=>x.klass===c); if (inUse&&!confirm("Candidates assigned. Remove?")) return; if (!inUse&&!confirm("Remove class?")) return; setClasses(prev=>prev.filter(x=>x!==c)); };
-  return (
-    <>
-      <div className="admin-h"><div><h2>Classes</h2><div className="desc">Class &amp; section roster for prefect ballots</div></div></div>
-      <div style={{display:"flex",gap:10,marginBottom:20}}>
-        <input className="input" placeholder="e.g. 11-A" value={newClass} onChange={e => setNewClass(e.target.value)} onKeyDown={e => e.key==="Enter"&&handleAdd()} style={{maxWidth:200}}/>
-        <button className="btn btn-primary" onClick={handleAdd}>+ Add Class</button>
-      </div>
-      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill, minmax(120px, 1fr))",gap:10}}>
-        {classes.map(c => { const count=candidates.filter(x=>x.klass===c).length; return (
-          <div key={c} style={{border:"1.5px solid var(--rule)",background:"var(--paper)",padding:"14px 12px",display:"flex",justifyContent:"space-between",alignItems:"center",borderRadius:2}}>
-            <div><div style={{fontFamily:"var(--serif)",fontSize:22,lineHeight:1}}>{c}</div><div style={{fontFamily:"var(--mono)",fontSize:10,textTransform:"uppercase",letterSpacing:"0.14em",color:"var(--ink-3)",marginTop:4}}>{count} cand.</div></div>
-            <button className="x-btn" onClick={() => handleRemove(c)}>\u2715</button>
-          </div>
-        );})}
-      </div>
-    </>
-  );
+    <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill, minmax(120px, 1fr))",gap:10}}>
+      {classes.map(c=>{const count=candidates.filter(x=>x.class===c).length;return(
+        <div key={c} style={{border:"1.5px solid var(--rule)",background:"var(--paper)",padding:"14px 12px",display:"flex",justifyContent:"space-between",alignItems:"center",borderRadius:2}}>
+          <div><div style={{fontFamily:"var(--serif)",fontSize:22,lineHeight:1}}>{c}</div><div style={{fontFamily:"var(--mono)",fontSize:10,textTransform:"uppercase",letterSpacing:"0.14em",color:"var(--ink-3)",marginTop:4}}>{count} cand.</div></div>
+          <button className="x-btn" onClick={()=>handleRemove(c)}>✕</button>
+        </div>
+      );})}
+    </div>
+  </>);
 };
 
-const SettingsAdmin = ({ votingOpen, setVotingOpen, votes, setVotes, setCandidates }) => (
-  <>
-    <div className="admin-h"><div><h2>Polling Window &amp; Records</h2><div className="desc">Operational controls for the election</div></div></div>
+const SettingsAdmin = ({ votingOpen, setVotingOpen, votes, setVotes, setCandidates, reload }) => {
+  const [saving,setSaving]=useState(false);
+  const togglePolls=async(v)=>{setSaving(true);await sb.from("settings").upsert({key:"voting_open",value:v});setVotingOpen(v);setSaving(false);};
+  const handleReset=async()=>{if(!confirm("Reset all cast ballots? Cannot be undone."))return;setSaving(true);await sb.from("votes").delete().neq("id","00000000-0000-0000-0000-000000000000");setVotes([]);setSaving(false);};
+  const handleReseed=async()=>{
+    if(!confirm("Restore seed candidates? This replaces current candidates."))return;
+    setSaving(true);
+    await sb.from("candidates").delete().neq("id","NONE");
+    const rows=[
+      {id:"c1",name:"Aarav Sharma",role:"sc_b",gender:"Boy",house:null,class:null,symbol:"star"},{id:"c2",name:"Reyansh Gurung",role:"sc_b",gender:"Boy",house:null,class:null,symbol:"compass"},{id:"c3",name:"Vihaan Thapa",role:"sc_b",gender:"Boy",house:null,class:null,symbol:"shield"},
+      {id:"c4",name:"Anaisha Rai",role:"sc_g",gender:"Girl",house:null,class:null,symbol:"flower"},{id:"c5",name:"Saanvi Karki",role:"sc_g",gender:"Girl",house:null,class:null,symbol:"moon"},{id:"c6",name:"Mira Pradhan",role:"sc_g",gender:"Girl",house:null,class:null,symbol:"sun"},
+      {id:"c7",name:"Kabir Limbu",role:"vsc_b",gender:"Boy",house:null,class:null,symbol:"feather"},{id:"c8",name:"Arjun Basnet",role:"vsc_b",gender:"Boy",house:null,class:null,symbol:"anchor"},
+      {id:"c9",name:"Ishita Subba",role:"vsc_g",gender:"Girl",house:null,class:null,symbol:"bird"},{id:"c10",name:"Pari Adhikari",role:"vsc_g",gender:"Girl",house:null,class:null,symbol:"leaf"},
+      {id:"c11",name:"Rohan Khadka",role:"hc",gender:null,house:"sargas",class:null,symbol:"lamp"},{id:"c12",name:"Diya Tamang",role:"hc",gender:null,house:"sargas",class:null,symbol:"diamond"},
+      {id:"c13",name:"Aryan Magar",role:"hc",gender:null,house:"sirius",class:null,symbol:"key"},{id:"c14",name:"Nisha Bhattarai",role:"hc",gender:null,house:"sirius",class:null,symbol:"fish"},
+      {id:"c15",name:"Sahil Joshi",role:"hc",gender:null,house:"pollux",class:null,symbol:"crown"},{id:"c16",name:"Tara Shrestha",role:"hc",gender:null,house:"pollux",class:null,symbol:"bell"},
+      {id:"c17",name:"Rishi Chettri",role:"hc",gender:null,house:"deneb",class:null,symbol:"tree"},{id:"c18",name:"Aanya Dahal",role:"hc",gender:null,house:"deneb",class:null,symbol:"flag"},
+      {id:"c19",name:"Niraj Bhandari",role:"vhc",gender:null,house:"sargas",class:null,symbol:"drum"},{id:"c20",name:"Priya Lama",role:"vhc",gender:null,house:"sargas",class:null,symbol:"mountain"},
+      {id:"c21",name:"Aakash Rana",role:"vhc",gender:null,house:"sirius",class:null,symbol:"globe"},{id:"c22",name:"Riya Maharjan",role:"vhc",gender:null,house:"sirius",class:null,symbol:"scroll"},
+      {id:"c23",name:"Yash Acharya",role:"vhc",gender:null,house:"pollux",class:null,symbol:"pen"},{id:"c24",name:"Krisha Sapkota",role:"vhc",gender:null,house:"pollux",class:null,symbol:"book"},
+      {id:"c25",name:"Manish Poudel",role:"vhc",gender:null,house:"deneb",class:null,symbol:"tree"},{id:"c26",name:"Sneha Khatri",role:"vhc",gender:null,house:"deneb",class:null,symbol:"leaf"},
+    ];
+    await sb.from("candidates").insert(rows);
+    setCandidates(rows);
+    setSaving(false);
+  };
+  return (<>
+    {saving&&<LoadingOverlay msg="Saving…"/>}
+    <div className="admin-h"><div><h2>Polling Window & Records</h2><div className="desc">Operational controls</div></div></div>
     <div style={{border:"1.5px solid var(--rule)",background:"var(--paper)",padding:22,marginBottom:18}}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:18}}>
         <div><h3 style={{fontSize:22,marginBottom:6}}>Polling Status</h3><p style={{margin:0,fontFamily:"var(--mono)",fontSize:11,textTransform:"uppercase",letterSpacing:"0.14em",color:"var(--ink-3)"}}>When closed, students cannot enter the booth.</p></div>
-        <Toggle checked={votingOpen} onChange={setVotingOpen} label={votingOpen?"Polls Open":"Polls Closed"}/>
+        <Toggle checked={votingOpen} onChange={togglePolls} label={votingOpen?"Polls Open":"Polls Closed"}/>
       </div>
     </div>
     <div style={{border:"1.5px solid var(--rule)",background:"var(--paper)",padding:22,marginBottom:18}}>
       <h3 style={{fontSize:22,marginBottom:6}}>Cast Ballots</h3>
       <p style={{margin:"0 0 14px",fontFamily:"var(--mono)",fontSize:11,textTransform:"uppercase",letterSpacing:"0.14em",color:"var(--ink-3)"}}>{votes.length} ballots on record</p>
-      <button className="btn" style={{borderColor:"var(--stamp)",color:"var(--stamp)"}} onClick={() => { if (confirm("Reset all cast ballots? Cannot be undone.")) setVotes([]); }}>Clear All Ballots</button>
+      <button className="btn" style={{borderColor:"var(--stamp)",color:"var(--stamp)"}} onClick={handleReset}>Clear All Ballots</button>
     </div>
     <div style={{border:"1.5px solid var(--rule)",background:"var(--paper)",padding:22}}>
       <h3 style={{fontSize:22,marginBottom:6}}>Demo Data</h3>
-      <p style={{margin:"0 0 14px",fontFamily:"var(--mono)",fontSize:11,textTransform:"uppercase",letterSpacing:"0.14em",color:"var(--ink-3)"}}>Restore the original seed candidate list (does not affect votes)</p>
-      <button className="btn" onClick={() => { if (confirm("Restore seed candidates?")) setCandidates(seedCandidates()); }}>Restore Seed Candidates</button>
+      <p style={{margin:"0 0 14px",fontFamily:"var(--mono)",fontSize:11,textTransform:"uppercase",letterSpacing:"0.14em",color:"var(--ink-3)"}}>Restore original seed candidates (does not affect votes)</p>
+      <button className="btn" onClick={handleReseed}>Restore Seed Candidates</button>
     </div>
-  </>
-);
-
-const ExportAdmin = ({ candidates, votes, houses }) => {
-  const buildVotesCsv = () => {
-    const header = ["timestamp","voter_name","class","house",...ROLES.map(r => r.id+(r.gender?"_"+r.gender.toLowerCase():""))];
-    const rows = votes.map(v => [new Date(v.ts).toISOString(),v.name,v.klass,houses.find(h=>h.id===v.house)?.name||"",...ROLES.map(r => { const c=candidates.find(c=>c.id===v.picks[r.id]); return c?c.name:""; })]);
-    return [header,...rows].map(r => r.map(cell => `"${(cell??"").toString().replace(/"/g,'""')}"`).join(",")).join("\n");
-  };
-  const buildTallyCsv = () => {
-    const lines = [["role","house_or_class","candidate","symbol","votes"]];
-    for (const r of ROLES) { const cands=candidates.filter(c=>c.role===r.id); for (const c of cands) { const n=votes.filter(v=>v.picks[r.id]===c.id).length; const scope=r.scope==="house"?houses.find(h=>h.id===c.house)?.name:r.scope==="class"?c.klass:"school"; lines.push([r.label+(r.gender?` (${r.gender})`:""),(scope||""),c.name,c.symbol,n]); } }
-    return lines.map(r => r.map(cell => `"${(cell??"").toString().replace(/"/g,'""')}"`).join(",")).join("\n");
-  };
-  const download = (filename, csv) => { const blob=new Blob([csv],{type:"text/csv"}); const url=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download=filename; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url); };
-  return (
-    <>
-      <div className="admin-h"><div><h2>Export Records</h2><div className="desc">Generate CSV files for the school office</div></div></div>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}}>
-        <div style={{border:"1.5px solid var(--rule)",background:"var(--paper)",padding:22}}><h3 style={{fontSize:22}}>Raw Ballot Log</h3><p style={{fontFamily:"var(--mono)",fontSize:11,textTransform:"uppercase",letterSpacing:"0.14em",color:"var(--ink-3)",margin:"6px 0 16px"}}>One row per cast ballot, timestamp and all selections.</p><button className="btn btn-primary" onClick={() => download("dps-ballots.csv",buildVotesCsv())}>Download CSV</button></div>
-        <div style={{border:"1.5px solid var(--rule)",background:"var(--paper)",padding:22}}><h3 style={{fontSize:22}}>Tally Summary</h3><p style={{fontFamily:"var(--mono)",fontSize:11,textTransform:"uppercase",letterSpacing:"0.14em",color:"var(--ink-3)",margin:"6px 0 16px"}}>Vote totals per candidate across every role and group.</p><button className="btn btn-primary" onClick={() => download("dps-tally.csv",buildTallyCsv())}>Download CSV</button></div>
-      </div>
-    </>
-  );
+  </>);
 };
 
-// ============================================================
-// MAIN APP
-// ============================================================
-const App = () => {
-  const [route, setRoute] = useState("welcome");
-  const [candidates, setCandidates] = useLocalState("dps_candidates", seedCandidates);
-  const [votes, setVotes] = useLocalState("dps_votes", []);
-  const [houses, setHouses] = useLocalState("dps_houses_v2", HOUSES);
-  const [classes, setClasses] = useLocalState("dps_classes", CLASSES);
-  const [votingOpen, setVotingOpen] = useLocalState("dps_votingOpen", true);
-  const adminPassword = "dps2026";
+const ExportAdmin = ({ candidates, votes, houses }) => {
+  const dl=(filename,csv)=>{const blob=new Blob([csv],{type:"text/csv"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=filename;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);};
+  const votesCsv=()=>{
+    const h=["timestamp","voter_name","class","house",...ROLES.map(r=>r.id+(r.gender?"_"+r.gender.toLowerCase():""))];
+    const rows=votes.map(v=>[new Date(v.ts).toISOString(),v.voter_name,v.class,houses.find(h=>h.id===v.house)?.name||"",...ROLES.map(r=>{const c=candidates.find(c=>c.id===v.picks[r.id]);return c?c.name:"";})]);
+    return[h,...rows].map(r=>r.map(x=>`"${(x??"").toString().replace(/"/g,'""')}"`).join(",")).join("\n");
+  };
+  const tallyCsv=()=>{
+    const lines=[["role","house_or_class","candidate","symbol","votes"]];
+    for(const r of ROLES){for(const c of candidates.filter(x=>x.role===r.id)){const n=votes.filter(v=>v.picks[r.id]===c.id).length;const scope=r.scope==="house"?houses.find(h=>h.id===c.house)?.name:r.scope==="class"?c.class:"school";lines.push([r.label+(r.gender?` (${r.gender})`:""),scope||"",c.name,c.symbol,n]);}}
+    return lines.map(r=>r.map(x=>`"${(x??"").toString().replace(/"/g,'""')}"`).join(",")).join("\n");
+  };
+  return (<>
+    <div className="admin-h"><div><h2>Export Records</h2><div className="desc">Generate CSV files for the school office</div></div></div>
+    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}}>
+      <div style={{border:"1.5px solid var(--rule)",background:"var(--paper)",padding:22}}><h3 style={{fontSize:22}}>Raw Ballot Log</h3><p style={{fontFamily:"var(--mono)",fontSize:11,textTransform:"uppercase",letterSpacing:"0.14em",color:"var(--ink-3)",margin:"6px 0 16px"}}>One row per cast ballot.</p><button className="btn btn-primary" onClick={()=>dl("dps-ballots.csv",votesCsv())}>Download CSV</button></div>
+      <div style={{border:"1.5px solid var(--rule)",background:"var(--paper)",padding:22}}><h3 style={{fontSize:22}}>Tally Summary</h3><p style={{fontFamily:"var(--mono)",fontSize:11,textTransform:"uppercase",letterSpacing:"0.14em",color:"var(--ink-3)",margin:"6px 0 16px"}}>Vote totals per candidate.</p><button className="btn btn-primary" onClick={()=>dl("dps-tally.csv",tallyCsv())}>Download CSV</button></div>
+    </div>
+  </>);
+};
 
-  const hasVoted = (name, klass) => {
-    const n = name.trim().toLowerCase();
-    return votes.some(v => v.name.trim().toLowerCase()===n && v.klass===klass);
+// ─── Root App ─────────────────────────────────────────────────────────────────
+const App = () => {
+  const [route,setRoute]=useState("welcome");
+  const [loading,setLoading]=useState(true);
+  const [candidates,setCandidates]=useState([]);
+  const [votes,setVotes]=useState([]);
+  const [houses,setHouses]=useState([]);
+  const [classes,setClasses]=useState([]);
+  const [votingOpen,setVotingOpen]=useState(true);
+
+  const loadAll=useCallback(async()=>{
+    setLoading(true);
+    const [ch,cc,ccand,cv,cs]=await Promise.all([
+      sb.from("houses").select("*").order("name"),
+      sb.from("classes").select("id").order("id"),
+      sb.from("candidates").select("*").order("name"),
+      sb.from("votes").select("*").order("ts"),
+      sb.from("settings").select("*"),
+    ]);
+    if(ch.data) setHouses(ch.data);
+    if(cc.data) setClasses(cc.data.map(r=>r.id));
+    if(ccand.data) setCandidates(ccand.data);
+    if(cv.data) setVotes(cv.data);
+    if(cs.data){const vo=cs.data.find(s=>s.key==="voting_open");if(vo)setVotingOpen(vo.value===true||vo.value==="true");}
+    setLoading(false);
+  },[]);
+
+  useEffect(()=>{loadAll();},[loadAll]);
+
+  // Realtime subscriptions
+  useEffect(()=>{
+    const ch=sb.channel("realtime-dps")
+      .on("postgres_changes",{event:"*",schema:"public",table:"votes"},payload=>{
+        if(payload.eventType==="INSERT") setVotes(prev=>[...prev,payload.new]);
+        else if(payload.eventType==="DELETE") setVotes(prev=>prev.filter(v=>v.id!==payload.old.id));
+      })
+      .on("postgres_changes",{event:"*",schema:"public",table:"settings"},payload=>{
+        if(payload.new?.key==="voting_open") setVotingOpen(payload.new.value===true||payload.new.value==="true");
+      })
+      .on("postgres_changes",{event:"*",schema:"public",table:"candidates"},()=>{ sb.from("candidates").select("*").order("name").then(({data})=>{if(data)setCandidates(data);}); })
+      .subscribe();
+    return()=>sb.removeChannel(ch);
+  },[]);
+
+  const checkHasVoted=async(name,klass)=>{
+    const {data}=await sb.from("votes").select("id").ilike("voter_name",name).eq("class",klass).limit(1);
+    return data&&data.length>0;
   };
 
-  const ArrowIco = () => <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>;
+  const handleSubmitVote=async(vote)=>{
+    const{data}=await sb.from("votes").insert(vote).select().single();
+    if(data) setVotes(prev=>[...prev,data]);
+  };
 
-  return (
-    <>
-      <Letterhead
-        subtitle="Student Council Election — 2026"
-        right={route !== "welcome" && (
-          <div style={{display:"flex",alignItems:"center",gap:14}}>
-            <Chip variant={votingOpen?"tick":"stamp"}>{votingOpen?"Polls Open":"Polls Closed"}</Chip>
-            <button className="btn btn-sm" onClick={() => setRoute("welcome")}>
-              <svg className="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 12L12 3l9 9M5 10v10h14V10"/></svg>
-              Home
-            </button>
-          </div>
-        )}
-      />
+  const ArrowIco=()=><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>;
 
-      {route === "welcome" && (
-        <div className="welcome">
-          <div className="welcome-card">
-            <SheetCorners/>
-            <Watermark text="DPS BIRATNAGAR \u00b7 OFFICIAL BALLOT"/>
-            <div className="welcome-inner">
-              <div className="welcome-eyebrow">Office of the Returning Officer</div>
-              <h1>Student Council<br/>Election &mdash; 2026</h1>
-              <p className="scroll">
-                You are entering the official polling system of <strong>DPS Biratnagar</strong>.<br/>
-                Choose your entry below. All ballots cast are sealed and final.
-              </p>
-              <RuleOrn/>
-              <div className="welcome-actions">
-                <button className="action-card" onClick={() => setRoute("student")}>
-                  <div className="ac-eye">Booth \u00b7 A</div>
-                  <div className="ac-h">Cast My Ballot</div>
-                  <div className="ac-desc">Enter the polling booth as a student. Identity \u2192 House \u2192 Seven ballots.</div>
-                  <div className="ac-arrow"><ArrowIco/></div>
-                </button>
-                <button className="action-card" onClick={() => setRoute("adminLock")}>
-                  <div className="ac-eye">Booth \u00b7 B</div>
-                  <div className="ac-h">Returning Officer</div>
-                  <div className="ac-desc">Manage candidates, monitor live results, export records and open/close polls.</div>
-                  <div className="ac-arrow"><ArrowIco/></div>
-                </button>
-              </div>
-              <div style={{marginTop:32,fontFamily:"var(--mono)",fontSize:10,fontWeight:600,textTransform:"uppercase",letterSpacing:"0.24em",color:"var(--ink-3)",display:"inline-flex",alignItems:"center",gap:10}}>
-                <span style={{width:8,height:8,borderRadius:"50%",background:votingOpen?"var(--tick)":"var(--stamp)",boxShadow:`0 0 0 4px ${votingOpen?"rgba(31,111,67,0.15)":"rgba(139,31,47,0.15)"}`}}/>
-                {votingOpen ? "Polls are presently open \u00b7 Identification required" : "Polls are presently closed"}
-              </div>
+  if(loading) return <LoadingOverlay msg="Connecting to Supabase…"/>;
+
+  return (<>
+    <Letterhead subtitle="Student Council Election — 2026" right={route!=="welcome"&&(
+      <div style={{display:"flex",alignItems:"center",gap:14}}>
+        <Chip variant={votingOpen?"tick":"stamp"}>{votingOpen?"Polls Open":"Polls Closed"}</Chip>
+        <button className="btn btn-sm" onClick={()=>setRoute("welcome")}>
+          <svg className="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 12L12 3l9 9M5 10v10h14V10"/></svg>Home
+        </button>
+      </div>
+    )}/>
+
+    {route==="welcome"&&(
+      <div className="welcome">
+        <div className="welcome-card">
+          <SheetCorners/><Watermark text="DPS BIRATNAGAR · OFFICIAL BALLOT"/>
+          <div className="welcome-inner">
+            <div className="welcome-eyebrow">Office of the Returning Officer</div>
+            <h1>Student Council<br/>Election &mdash; 2026</h1>
+            <p className="scroll">You are entering the official polling system of <strong>DPS Biratnagar</strong>.<br/>Choose your entry below. All ballots cast are sealed and final.</p>
+            <RuleOrn/>
+            <div className="welcome-actions">
+              <button className="action-card" onClick={()=>setRoute("student")}>
+                <div className="ac-eye">Booth · A</div><div className="ac-h">Cast My Ballot</div>
+                <div className="ac-desc">Enter the polling booth as a student. Identity → House → Seven ballots.</div>
+                <div className="ac-arrow"><ArrowIco/></div>
+              </button>
+              <button className="action-card" onClick={()=>setRoute("adminLock")}>
+                <div className="ac-eye">Booth · B</div><div className="ac-h">Returning Officer</div>
+                <div className="ac-desc">Manage candidates, monitor live results, export records and open/close polls.</div>
+                <div className="ac-arrow"><ArrowIco/></div>
+              </button>
+            </div>
+            <div style={{marginTop:32,fontFamily:"var(--mono)",fontSize:10,fontWeight:600,textTransform:"uppercase",letterSpacing:"0.24em",color:"var(--ink-3)",display:"inline-flex",alignItems:"center",gap:10}}>
+              <span style={{width:8,height:8,borderRadius:"50%",background:votingOpen?"var(--tick)":"var(--stamp)",boxShadow:`0 0 0 4px ${votingOpen?"rgba(31,111,67,0.15)":"rgba(139,31,47,0.15)"}`}}/>
+              {votingOpen?"Polls are presently open · Identification required":"Polls are presently closed"}
             </div>
           </div>
         </div>
-      )}
+      </div>
+    )}
 
-      {route === "adminLock" && (
-        <AdminLock expectedPw={adminPassword} onUnlock={() => setRoute("admin")}/>
-      )}
+    {route==="adminLock"&&<AdminLock onUnlock={()=>setRoute("admin")}/>}
 
-      {route === "student" && (
-        <StudentApp candidates={candidates} votingOpen={votingOpen} onSubmitVote={v => setVotes(prev => [...prev,v])} hasVoted={hasVoted}/>
-      )}
+    {route==="student"&&<StudentApp candidates={candidates} houses={houses} classes={classes} votingOpen={votingOpen} onSubmitVote={handleSubmitVote} checkHasVoted={checkHasVoted}/>}
 
-      {route === "admin" && (
-        <AdminApp
-          candidates={candidates} setCandidates={setCandidates}
-          votes={votes} setVotes={setVotes}
-          houses={houses} setHouses={setHouses}
-          classes={classes} setClasses={setClasses}
-          votingOpen={votingOpen} setVotingOpen={setVotingOpen}
-        />
-      )}
-    </>
-  );
+    {route==="admin"&&<AdminApp candidates={candidates} setCandidates={setCandidates} votes={votes} setVotes={setVotes} houses={houses} setHouses={setHouses} classes={classes} setClasses={setClasses} votingOpen={votingOpen} setVotingOpen={setVotingOpen} reload={loadAll}/>}
+  </>);
 };
 
-const root = ReactDOM.createRoot(document.getElementById("root"));
-root.render(<App/>);
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
 </script>
 </body>
 </html>
