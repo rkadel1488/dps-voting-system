@@ -283,7 +283,7 @@ const ROLES = [
   { id:"sc",    label:"School Captain",       gender:null,   scope:"school" },
   { id:"vc_b",  label:"Vice Captain",         gender:"Boy",  scope:"school" },
   { id:"vc_g",  label:"Vice Captain",         gender:"Girl", scope:"school" },
-  { id:"cc",    label:"Chief Captain",        gender:null,   scope:"school" },
+  { id:"cc",    label:"School Chief Prefect",        gender:null,   scope:"school" },
   { id:"hc",    label:"House Captain",        gender:null,   scope:"house"  },
   { id:"vhc_b", label:"Vice House Captain",   gender:"Boy",  scope:"house"  },
   { id:"vhc_g", label:"Vice House Captain",   gender:"Girl", scope:"house"  },
@@ -582,17 +582,27 @@ const StudentApp = ({ candidates, houses, classes, votingOpen, onSubmitVote, che
                 <div className="empty"><h4>No candidates listed.</h4><p>The Returning Officer has not registered candidates for this role.</p></div>
               ):(
                 <div className="ballot-grid">
-                  {candidatesForCurrent.map((c,i)=>(
-                    <button key={c.id} className={"candidate-card"+(picked===c.id?" selected":"")} onClick={()=>setPicks(p=>({...p,[currentRole.id]:c.id}))}>
-                      <div className="candidate-sl">{String(i+1).padStart(2,"0")}</div>
-                      <div className="candidate-body">
-                        <div className="candidate-name">{c.name}</div>
-                        <div className="candidate-meta">{currentRole.scope==="school"?"School Candidate":currentRole.scope==="house"?`${houses.find(h=>h.id===house)?.name} House`:`Class ${klass}`}</div>
-                      </div>
-                      <div className="candidate-symbol"><BallotSymbol name={c.symbol}/></div>
-                      {picked===c.id&&<div className="tick-stamp"><div><div style={{fontSize:28,fontFamily:"var(--serif)",letterSpacing:0}}>✓</div><div style={{marginTop:4}}>Voted</div></div></div>}
-                    </button>
-                  ))}
+                  {candidatesForCurrent.map((c,i)=>{
+                    const symbolOnly=["sc","vc_b","vc_g","cc"].includes(currentRole.id);
+                    return (
+                      <button key={c.id} className={"candidate-card"+(picked===c.id?" selected":"")} onClick={()=>setPicks(p=>({...p,[currentRole.id]:c.id}))} style={symbolOnly?{gridTemplateColumns:"1fr"}:{}}>
+                        {!symbolOnly&&<div className="candidate-sl">{String(i+1).padStart(2,"0")}</div>}
+                        {symbolOnly?(
+                          <div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"26px 16px",gap:12,minHeight:110}}>
+                            <div style={{width:68,height:68,display:"grid",placeItems:"center",color:"var(--sl-color,var(--ink))"}}><BallotSymbol name={c.symbol}/></div>
+                            <div style={{fontFamily:"var(--mono)",fontSize:10,textTransform:"uppercase",letterSpacing:"0.2em",color:"var(--ink-3)"}}>Candidate {String(i+1).padStart(2,"0")}</div>
+                          </div>
+                        ):(
+                          <div className="candidate-body">
+                            <div className="candidate-name">{c.name}</div>
+                            <div className="candidate-meta">{currentRole.scope==="school"?"School Candidate":currentRole.scope==="house"?`${houses.find(h=>h.id===house)?.name} House`:`Class ${klass}`}</div>
+                          </div>
+                        )}
+                        {!symbolOnly&&<div className="candidate-symbol"><BallotSymbol name={c.symbol}/></div>}
+                        {picked===c.id&&<div className="tick-stamp"><div><div style={{fontSize:28,fontFamily:"var(--serif)",letterSpacing:0}}>✓</div><div style={{marginTop:4}}>Voted</div></div></div>}
+                      </button>
+                    );
+                  })}
                 </div>
               )}
               <div style={{marginTop:26,paddingTop:18,borderTop:"1px dashed rgba(20,33,61,0.25)",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
