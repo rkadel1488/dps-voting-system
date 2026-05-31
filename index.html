@@ -929,7 +929,7 @@ const ClassesAdmin = ({ classes, setClasses, candidates, reload }) => {
     {saving&&<LoadingOverlay msg="Saving…"/>}
     <div className="admin-h"><div><h2>Classes</h2><div className="desc">Class & section roster for prefect ballots</div></div></div>
     <div style={{display:"flex",gap:10,marginBottom:20}}>
-      <input className="input" placeholder="e.g. 11-A" value={newClass} onChange={e=>setNewClass(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleAdd()} style={{maxWidth:200}}/>
+      <input className="input" placeholder="e.g. 11-Science" value={newClass} onChange={e=>setNewClass(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleAdd()} style={{maxWidth:200}}/>
       <button className="btn btn-primary" onClick={handleAdd}>+ Add Class</button>
     </div>
     <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill, minmax(120px, 1fr))",gap:10}}>
@@ -1044,9 +1044,8 @@ const App = () => {
   // Realtime subscriptions
   useEffect(()=>{
     const ch=sb.channel("realtime-dps")
-      .on("postgres_changes",{event:"*",schema:"public",table:"votes"},payload=>{
-        if(payload.eventType==="INSERT") setVotes(prev=>[...prev,payload.new]);
-        else if(payload.eventType==="DELETE") setVotes(prev=>prev.filter(v=>v.id!==payload.old.id));
+      .on("postgres_changes",{event:"*",schema:"public",table:"votes"},()=>{
+        sb.from("votes").select("*").order("ts").then(({data})=>{ if(data) setVotes(data); });
       })
       .on("postgres_changes",{event:"*",schema:"public",table:"settings"},payload=>{
         if(payload.new?.key==="voting_open") setVotingOpen(payload.new.value===true||payload.new.value==="true");
