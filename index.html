@@ -451,13 +451,20 @@ const StudentApp = ({ candidates, houses, classes, votingOpen, onSubmitVote, che
   };
 
   const handleVoteNext=async()=>{
-    if(!picks[currentRole.id]) return;
+    // Only block if this role has candidates but nothing is selected
+    if(candidatesForCurrent.length>0 && !picks[currentRole.id]) return;
     if(roleIdx<ROLES.length-1){goToVote(roleIdx+1);}
     else{
       setSubmitting(true);
-      await onSubmitVote({voter_name:name.trim(),class:klass,house,picks,ts:Date.now()});
-      setSubmitting(false);
-      setStep("done");
+      try{
+        await onSubmitVote({voter_name:name.trim(),class:klass,house,picks:JSON.parse(JSON.stringify(picks)),ts:Date.now()});
+        setStep("done");
+      } catch(err){
+        console.error("Submit failed:",err);
+        alert("Failed to submit ballot. Please try again.");
+      } finally{
+        setSubmitting(false);
+      }
     }
   };
 
@@ -1055,7 +1062,8 @@ const App = () => {
   };
 
   const handleSubmitVote=async(vote)=>{
-    const{data}=await sb.from("votes").insert(vote).select().single();
+    const{data,error}=await sb.from("votes").insert(vote).select().single();
+    if(error) throw new Error(error.message);
     if(data) setVotes(prev=>[...prev,data]);
   };
 
