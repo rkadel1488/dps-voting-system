@@ -608,7 +608,7 @@ const StudentApp = ({ candidates, houses, classes, votingOpen, onSubmitVote, che
               )}
               <div style={{marginTop:26,paddingTop:18,borderTop:"1px dashed rgba(20,33,61,0.25)",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
                 <button className="btn btn-ghost" onClick={()=>{if(roleIdx===0)setStep("house");else goToVote(roleIdx-1);}}>← Back</button>
-                <button className={"btn "+(isLast?"btn-stamp":"btn-primary")} onClick={handleVoteNext} disabled={!picked}>{isLast?"Seal & Submit Ballot":"Confirm & Next Ballot →"}</button>
+                <button className={"btn "+(isLast?"btn-stamp":"btn-primary")} onClick={handleVoteNext} disabled={candidatesForCurrent.length>0&&!picked}>{isLast?"Seal & Submit Ballot":"Confirm & Next Ballot →"}</button>
               </div>
             </div>
           </div>
