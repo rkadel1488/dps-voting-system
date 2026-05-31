@@ -584,9 +584,10 @@ const StudentApp = ({ candidates, houses, classes, votingOpen, onSubmitVote, che
                 <div className="ballot-grid">
                   {candidatesForCurrent.map((c,i)=>{
                     const symbolOnly=["sc","vc_b","vc_g","cc"].includes(currentRole.id);
+                    const nameOnly=["hc","vhc_b","vhc_g","cp"].includes(currentRole.id);
                     return (
-                      <button key={c.id} className={"candidate-card"+(picked===c.id?" selected":"")} onClick={()=>setPicks(p=>({...p,[currentRole.id]:c.id}))} style={symbolOnly?{gridTemplateColumns:"1fr"}:{}}>
-                        {!symbolOnly&&<div className="candidate-sl">{String(i+1).padStart(2,"0")}</div>}
+                      <button key={c.id} className={"candidate-card"+(picked===c.id?" selected":"")} onClick={()=>setPicks(p=>({...p,[currentRole.id]:c.id}))} style={symbolOnly?{gridTemplateColumns:"1fr"}:nameOnly?{gridTemplateColumns:"78px 1fr"}:{}}>
+                        <div className="candidate-sl">{String(i+1).padStart(2,"0")}</div>
                         {symbolOnly?(
                           <div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"26px 16px",gap:12,minHeight:110}}>
                             <div style={{width:68,height:68,display:"grid",placeItems:"center",color:"var(--sl-color,var(--ink))"}}><BallotSymbol name={c.symbol}/></div>
@@ -598,7 +599,7 @@ const StudentApp = ({ candidates, houses, classes, votingOpen, onSubmitVote, che
                             <div className="candidate-meta">{currentRole.scope==="school"?"School Candidate":currentRole.scope==="house"?`${houses.find(h=>h.id===house)?.name} House`:`Class ${klass}`}</div>
                           </div>
                         )}
-                        {!symbolOnly&&<div className="candidate-symbol"><BallotSymbol name={c.symbol}/></div>}
+                        {!symbolOnly&&!nameOnly&&<div className="candidate-symbol"><BallotSymbol name={c.symbol}/></div>}
                         {picked===c.id&&<div className="tick-stamp"><div><div style={{fontSize:28,fontFamily:"var(--serif)",letterSpacing:0}}>✓</div><div style={{marginTop:4}}>Voted</div></div></div>}
                       </button>
                     );
