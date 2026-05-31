@@ -280,12 +280,10 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ─── Static data ─────────────────────────────────────────────────────────────
 const ROLES = [
-  { id:"sc_b",  label:"School Captain",       gender:"Boy",  scope:"school" },
-  { id:"sc_g",  label:"School Captain",       gender:"Girl", scope:"school" },
+  { id:"sc",    label:"School Captain",       gender:null,   scope:"school" },
   { id:"vc_b",  label:"Vice Captain",         gender:"Boy",  scope:"school" },
   { id:"vc_g",  label:"Vice Captain",         gender:"Girl", scope:"school" },
-  { id:"cc_b",  label:"Chief Captain",        gender:"Boy",  scope:"school" },
-  { id:"cc_g",  label:"Chief Captain",        gender:"Girl", scope:"school" },
+  { id:"cc",    label:"Chief Captain",        gender:null,   scope:"school" },
   { id:"hc",    label:"House Captain",        gender:null,   scope:"house"  },
   { id:"vhc_b", label:"Vice House Captain",   gender:"Boy",  scope:"house"  },
   { id:"vhc_g", label:"Vice House Captain",   gender:"Girl", scope:"house"  },
@@ -744,7 +742,7 @@ const Candidates = ({ candidates, setCandidates, houses, classes }) => {
 };
 
 const CandidateModal = ({ initial, houses, classes, onClose, onSave }) => {
-  const [form,setForm]=useState({id:initial.id,name:initial.name||"",role:initial.role||"sc_b",gender:initial.gender||"Boy",house:initial.house||"",class:initial.class||"",symbol:initial.symbol||"star",photo:initial.photo||null});
+  const [form,setForm]=useState({id:initial.id,name:initial.name||"",role:initial.role||"sc",gender:initial.gender||"Boy",house:initial.house||"",class:initial.class||"",symbol:initial.symbol||"star",photo:initial.photo||null});
   const [symbolTab,setSymbolTab]=useState(()=>(initial.symbol&&initial.symbol.startsWith("data:"))?"upload":"preset");
   const role=ROLES.find(r=>r.id===form.role);
   const needsHouse=role?.scope==="house",needsClass=role?.scope==="class",needsGender=!!role?.gender;
@@ -917,8 +915,8 @@ const SettingsAdmin = ({ votingOpen, setVotingOpen, votes, setVotes, setCandidat
     setSaving(true);
     await sb.from("candidates").delete().neq("id","NONE");
     const rows=[
-      {id:"c1",name:"Aarav Sharma",role:"sc_b",gender:"Boy",house:null,class:null,symbol:"star"},{id:"c2",name:"Reyansh Gurung",role:"sc_b",gender:"Boy",house:null,class:null,symbol:"compass"},{id:"c3",name:"Vihaan Thapa",role:"sc_b",gender:"Boy",house:null,class:null,symbol:"shield"},
-      {id:"c4",name:"Anaisha Rai",role:"sc_g",gender:"Girl",house:null,class:null,symbol:"flower"},{id:"c5",name:"Saanvi Karki",role:"sc_g",gender:"Girl",house:null,class:null,symbol:"moon"},{id:"c6",name:"Mira Pradhan",role:"sc_g",gender:"Girl",house:null,class:null,symbol:"sun"},
+      {id:"c1",name:"Aarav Sharma",role:"sc",gender:null,house:null,class:null,symbol:"star"},{id:"c2",name:"Reyansh Gurung",role:"sc",gender:null,house:null,class:null,symbol:"compass"},{id:"c3",name:"Vihaan Thapa",role:"sc",gender:null,house:null,class:null,symbol:"shield"},
+      {id:"c4",name:"Anaisha Rai",role:"sc",gender:null,house:null,class:null,symbol:"flower"},{id:"c5",name:"Saanvi Karki",role:"sc",gender:null,house:null,class:null,symbol:"moon"},{id:"c6",name:"Mira Pradhan",role:"sc",gender:null,house:null,class:null,symbol:"sun"},
       {id:"c7",name:"Kabir Limbu",role:"vc_b",gender:"Boy",house:null,class:null,symbol:"feather"},{id:"c8",name:"Arjun Basnet",role:"vc_b",gender:"Boy",house:null,class:null,symbol:"anchor"},
       {id:"c9",name:"Ishita Subba",role:"vc_g",gender:"Girl",house:null,class:null,symbol:"bird"},{id:"c10",name:"Pari Adhikari",role:"vc_g",gender:"Girl",house:null,class:null,symbol:"leaf"},
       {id:"c11",name:"Rohan Khadka",role:"hc",gender:null,house:"sargas",class:null,symbol:"lamp"},{id:"c12",name:"Diya Tamang",role:"hc",gender:null,house:"sargas",class:null,symbol:"diamond"},
