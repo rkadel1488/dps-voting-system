@@ -764,7 +764,26 @@ const CandidateModal = ({ initial, houses, classes, onClose, onSave }) => {
     if(!needsClass&&form.class) setForm(f=>({...f,class:""}));
   },[form.role]);
   const handlePhoto=e=>{const file=e.target.files?.[0];if(!file)return;const reader=new FileReader();reader.onload=()=>setForm(f=>({...f,photo:reader.result}));reader.readAsDataURL(file);};
-  const handleSymbolUpload=e=>{const file=e.target.files?.[0];if(!file)return;const reader=new FileReader();reader.onload=()=>setForm(f=>({...f,symbol:reader.result}));reader.readAsDataURL(file);};
+  const handleSymbolUpload=e=>{
+    const file=e.target.files?.[0]; if(!file) return;
+    const reader=new FileReader();
+    reader.onload=evt=>{
+      const img=new Image();
+      img.onload=()=>{
+        const MAX=128;
+        const scale=Math.min(1, MAX/Math.max(img.width,img.height));
+        const w=Math.round(img.width*scale), h=Math.round(img.height*scale);
+        const canvas=document.createElement("canvas");
+        canvas.width=w; canvas.height=h;
+        const ctx=canvas.getContext("2d");
+        ctx.drawImage(img,0,0,w,h);
+        const png=canvas.toDataURL("image/png");
+        setForm(f=>({...f,symbol:png}));
+      };
+      img.src=evt.target.result;
+    };
+    reader.readAsDataURL(file);
+  };
   const clearSymbolUpload=()=>setForm(f=>({...f,symbol:"star"}));
   const isCustomSymbol=form.symbol&&form.symbol.startsWith("data:");
   const canSave=form.name.trim()&&(!needsHouse||form.house)&&(!needsClass||form.class);
