@@ -409,7 +409,6 @@ const AdminLock = ({ onUnlock }) => {
             <button className="btn-ghost btn btn-sm" onClick={()=>setShow(s=>!s)} style={{padding:"6px 0"}}>{show?"Hide":"Show"} passcode</button>
             <button className="btn btn-stamp" onClick={submit} disabled={!pw}>Authenticate \u2192</button>
           </div>
-          <div className="lock-hint"><span style={{width:6,height:6,borderRadius:"50%",background:"var(--seal)"}}/>Default passcode: <strong style={{color:"var(--ink)",letterSpacing:"0.18em"}}>dps2026</strong></div>
         </div>
       </div>
     </div>
@@ -642,6 +641,12 @@ const AdminApp = ({ candidates, setCandidates, votes, setVotes, houses, setHouse
           <button className={tab==="settings"?"active":""} onClick={()=>setTab("settings")}>Polling Window</button>
           <div className="admin-nav-section">Output</div>
           <button className={tab==="export"?"active":""} onClick={()=>setTab("export")}>Export Records</button>
+          <div style={{padding:"12px 8px 4px"}}>
+            <button className="btn btn-ghost btn-sm" style={{width:"100%",borderColor:"rgba(20,33,61,0.2)",justifyContent:"center",gap:6}} onClick={reload}>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+              Refresh Data
+            </button>
+          </div>
         </aside>
         <main className="admin-panel">
           {tab==="overview"&&<Overview candidates={candidates} votes={votes} houses={houses} votingOpen={votingOpen} onTab={setTab}/>}
